@@ -283,6 +283,7 @@
             }
             animationTimeout = setTimeout(() => {
                 calculateResults();
+                saveToLocalStorage(); // Save values after calculation
             }, 30); // Reduced delay for more responsive feel while still preventing excessive calculations
         }
 
@@ -298,6 +299,63 @@
 
         function formatCurrency(value) { return value.toLocaleString('nl-NL', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
         function calculateMonthlyMortgage(p, r, t) { if (r <= 0 || t <= 0 || p <= 0) return 0; const monthlyRate = r / 12; const n = t * 12; return p * (monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1); }
+
+        // --- LocalStorage Functions ---
+        const STORAGE_KEY = 'nl-buy-vs-rent-calculator';
+        
+        function saveToLocalStorage() {
+            try {
+                const values = getInputs();
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
+            } catch (error) {
+                console.warn('Could not save to localStorage:', error);
+            }
+        }
+        
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    return JSON.parse(saved);
+                }
+            } catch (error) {
+                console.warn('Could not load from localStorage:', error);
+            }
+            return null;
+        }
+        
+        function clearLocalStorage() {
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+            } catch (error) {
+                console.warn('Could not clear localStorage:', error);
+            }
+        }
+        
+        function applyStoredValues(values) {
+            // Apply slider/number inputs
+            Object.keys(inputsConfig).forEach(id => {
+                if (values[id] !== undefined) {
+                    const slider = el(`${id}-slider`);
+                    const number = el(`${id}-number`);
+                    if (slider && number) {
+                        slider.value = values[id];
+                        number.value = values[id];
+                    }
+                }
+            });
+            
+            // Apply radio buttons
+            if (values.maintenanceBasis) {
+                const radio = document.querySelector(`input[name="maintenanceBasis"][value="${values.maintenanceBasis}"]`);
+                if (radio) radio.checked = true;
+            }
+            
+            if (values.investmentTaxType) {
+                const radio = document.querySelector(`input[name="investmentTax"][value="${values.investmentTaxType}"]`);
+                if (radio) radio.checked = true;
+            }
+        }
 
         function calculateResults() {
             const inputs = getInputs();
@@ -574,6 +632,9 @@
             if (maintenanceBasisCurrent) maintenanceBasisCurrent.checked = true;
             if (investmentTaxTaxable) investmentTaxTaxable.checked = true;
             
+            // Clear localStorage
+            clearLocalStorage();
+            
             // Recalculate results with default values
             calculateResults();
         }
@@ -586,6 +647,13 @@
         window.onload = () => {
             Object.keys(inputsConfig).forEach(id => createSliderInput(id, inputsConfig[id]));
             setupInputListeners();
+            
+            // Load saved values from localStorage
+            const savedValues = loadFromLocalStorage();
+            if (savedValues) {
+                applyStoredValues(savedValues);
+            }
+            
             calculateResults();
         };
     </script>
