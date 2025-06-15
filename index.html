@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent vs. Buy Calculator - Netherlands</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .form-input {
+            @apply w-20 p-1 border border-gray-300 rounded-md shadow-sm text-sm text-right;
+        }
+        .form-label {
+            @apply block text-sm font-medium text-gray-700 mb-1;
+        }
+        .slider {
+            @apply w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer;
+        }
+        .slider::-webkit-slider-thumb {
+            @apply w-4 h-4 bg-indigo-600 rounded-full appearance-none cursor-pointer;
+        }
+        .slider::-moz-range-thumb {
+            @apply w-4 h-4 bg-indigo-600 rounded-full border-0 cursor-pointer;
+        }
+        .tooltip {
+            @apply relative inline-block cursor-help;
+        }
+        .tooltip .tooltiptext {
+            @apply invisible w-64 bg-gray-800 text-white text-left text-xs rounded-md py-2 px-3 absolute z-10 bottom-full left-1/2 -ml-32 opacity-0 transition-opacity duration-300 shadow-lg;
+        }
+        .tooltip:hover .tooltiptext {
+            @apply visible opacity-100;
+        }
+        .details-section.hidden { display: none; }
+        .table-container { max-height: 500px; overflow-y: auto; }
+        .table-container thead th { position: sticky; top: 0; z-index: 10; }
+        .sidebar {
+             max-height: calc(100vh - 4rem); /* Adjust based on your header/footer height */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-indigo-600">Interactive Rent vs. Buy Calculator</h1>
+            <p class="text-lg text-gray-600">Netherlands Edition</p>
+        </header>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Main Content: Summaries & Charts -->
+            <main class="lg:w-2/3 w-full">
+                <!-- Results Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-blue-50 p-6 rounded-lg shadow"><h3 class="text-xl font-semibold text-blue-700 mb-2">Renting Scenario</h3><p class="text-3xl font-bold text-blue-600" id="rentFinalNW">€0</p><p class="text-sm text-gray-500">Projected Net Worth</p></div>
+                    <div class="bg-green-50 p-6 rounded-lg shadow"><h3 class="text-xl font-semibold text-green-700 mb-2">Buying Scenario</h3><p class="text-3xl font-bold text-green-600" id="buyFinalNW">€0</p><p class="text-sm text-gray-500">Projected Net Worth (Equity)</p></div>
+                </div>
+                <div class="text-center mb-6 p-4 bg-indigo-50 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold text-indigo-700">Advantage After Time Horizon</h3>
+                    <p class="text-3xl font-bold text-indigo-600" id="rentingAdvantageValue">€0</p>
+                </div>
+
+                <!-- Charts -->
+                <div class="space-y-6">
+                    <div class="bg-white p-4 rounded-lg shadow h-[280px] md:h-[300px]"><canvas id="netWorthChart"></canvas></div>
+                    <div class="bg-white p-4 rounded-lg shadow h-[220px] md:h-[250px]"><canvas id="deltaChart"></canvas></div>
+                </div>
+                 <!-- Calculation Details & Table -->
+                <div class="bg-white p-6 rounded-xl shadow-xl mt-8">
+                    <button id="toggleDetailsButton" class="w-full text-left font-semibold text-indigo-600 p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition focus:outline-none">Show Key Totals Breakdown <span id="detailsArrow">▼</span></button>
+                    <div id="detailsSection" class="details-section hidden mt-4 p-6 bg-gray-50 border border-gray-200 rounded-lg">
+                        <!-- Details Content -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h3 class="text-xl font-semibold text-green-700 mb-4 border-b pb-2">Buying Breakdown</h3>
+                                <div class="space-y-2 text-sm">
+                                    <p class="flex justify-between"><span>Initial Upfront Costs:</span><strong id="detailUpfrontCosts">€0</strong></p>
+                                    <p class="flex justify-between"><span>Initial Loan Amount:</span><strong id="detailLoanAmount">€0</strong></p>
+                                    <p class="flex justify-between"><span>Monthly Mortgage (P&I):</span><strong id="detailMonthlyMortgage">€0</strong></p>
+                                    <hr class="my-2 border-gray-300">
+                                    <h4 class="font-semibold text-gray-600 pt-1">Total Costs Over Period</h4>
+                                    <p class="flex justify-between pl-2"><span>Mortgage Interest Paid:</span><strong id="detailTotalInterest">€0</strong></p>
+                                    <p class="flex justify-between pl-2 text-green-600"><span>Tax Deduction Benefit:</span><strong id="detailTotalDeduction">€0</strong></p>
+                                    <p class="flex justify-between pl-2"><span>Property Tax (OZB):</span><strong id="detailTotalOzb">€0</strong></p>
+                                    <p class="flex justify-between pl-2"><span>Maintenance:</span><strong id="detailTotalMaintenance">€0</strong></p>
+                                    <p class="flex justify-between pl-2"><span>VvE Fees:</span><strong id="detailTotalVve">€0</strong></p>
+                                    <hr class="my-2 border-gray-300">
+                                    <h4 class="font-semibold text-gray-600 pt-1">Final Outcome</h4>
+                                    <p class="flex justify-between"><span>Final Home Value:</span><strong id="detailFinalHomeValue">€0</strong></p>
+                                    <p class="flex justify-between"><span>Final Loan Balance:</span><strong id="detailFinalLoanBalance">€0</strong></p>
+                                    <p class="flex justify-between font-bold text-base pt-1"><span>Final Equity (Net Worth):</span><strong id="detailFinalEquity">€0</strong></p>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-blue-700 mb-4 border-b pb-2">Renting Breakdown</h3>
+                                <div class="space-y-2 text-sm">
+                                    <p class="flex justify-between"><span>Initial Investment:</span><strong id="detailInitialInvestment">€0</strong></p>
+                                    <p class="flex justify-between"><span>Extra Cash Invested:</span><strong id="detailTotalCashInvested">€0</strong></p>
+                                    <p class="flex justify-between"><span>Investment Growth:</span><strong id="detailTotalGrowth">€0</strong></p>
+                                    <hr class="my-2 border-gray-300">
+                                    <h4 class="font-semibold text-gray-600 pt-1">Total Costs Over Period</h4>
+                                    <p class="flex justify-between pl-2"><span>Total Rent Paid:</span><strong id="detailTotalRent">€0</strong></p>
+                                    <p class="flex justify-between pl-2"><span>Wealth Tax Paid (Box 3):</span><strong id="detailTotalWealthTax">€0</strong></p>
+                                    <hr class="my-2 border-gray-300">
+                                    <h4 class="font-semibold text-gray-600 pt-1">Final Outcome</h4>
+                                    <p class="flex justify-between font-bold text-base pt-1"><span>Final Investments (Net Worth):</span><strong id="detailFinalInvestments">€0</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <button id="toggleYearlyDataButton" class="w-full text-left font-semibold text-indigo-600 p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition focus:outline-none mt-4">Show Yearly Data Breakdown <span id="yearlyDataArrow">▼</span></button>
+                    <div id="yearlyDataSection" class="details-section hidden mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                        <!-- Yearly Data Table -->
+                        <div class="table-container">
+                            <table class="w-full text-sm text-left text-gray-600 whitespace-nowrap">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                                    <tr>
+                                        <th rowspan="2" class="py-3 px-4 align-bottom">Year</th>
+                                        <th colspan="5" class="py-2 px-4 text-center border-b border-l border-gray-300 bg-blue-100">Renter Details</th>
+                                        <th colspan="9" class="py-2 px-4 text-center border-b border-l border-gray-300 bg-green-100">Buyer Details</th>
+                                        <th rowspan="2" class="py-3 px-4 align-bottom border-l border-gray-300"><span class="tooltip">Advantage<span class="tooltiptext w-72">Compares the final net worth of both scenarios.<br><br><strong>Formula:</strong><br>Renter Net Worth - Buyer Net Worth<br><br>A positive value means renting is financially better. A negative value means buying is better.</span></span></th>
+                                    </tr>
+                                    <tr class="bg-gray-100">
+                                        <th class="py-2 px-3 border-l border-gray-300">Monthly Rent</th><th class="py-2 px-3">Yearly Rent</th><th class="py-2 px-3">Yearly Invested</th><th class="py-2 px-3">Growth</th><th class="py-2 px-3">Net Worth</th>
+                                        <th class="py-2 px-3 border-l border-gray-300">House Value</th><th class="py-2 px-3">EMI (P&I)</th><th class="py-2 px-3">Interest</th><th class="py-2 px-3">Deduction</th><th class="py-2 px-3">Net Interest</th><th class="py-2 px-3">Property Tax</th><th class="py-2 px-3">Maintenance</th><th class="py-2 px-3">VvE</th><th class="py-2 px-3">Net Worth</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="yearlyDataTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Sidebar with Inputs -->
+            <aside class="lg:w-1/3 w-full bg-white p-5 rounded-xl shadow-xl sidebar overflow-y-auto">
+                <div class="space-y-5">
+                    <!-- Common Assumptions -->
+                    <div class="p-4 border border-gray-200 rounded-lg"><h3 class="text-lg font-semibold mb-3 text-gray-700 border-b pb-2">Common Assumptions</h3><div id="timeHorizon-container"></div></div>
+                    <!-- Buy Scenario -->
+                    <div class="p-4 border border-gray-200 rounded-lg"><h3 class="text-lg font-semibold mb-3 text-green-700 border-b pb-2">▼ Buy Scenario</h3><div class="space-y-4"><div id="purchasePrice-container"></div><div id="downPayment-container"></div><div id="mortgageInterestRate-container"></div><div id="amortization-container"></div><div id="propertyTaxRate-container"></div><div id="maintenanceCosts-container"></div><div id="vveRate-container"></div><fieldset class="text-sm text-gray-600"><legend class="form-label -mb-1">Costs Based On:</legend><label class="mr-3"><input type="radio" name="maintenanceBasis" value="original" class="mr-1">Original Price</label><label><input type="radio" name="maintenanceBasis" value="current" checked class="mr-1">Current Value</label></fieldset><div id="propertyAppreciationRate-container"></div><div id="otherBuyerCostsRate-container"></div><div id="effectiveMarginalTaxRate-container"></div></div></div>
+                    <!-- Rent Scenario -->
+                    <div class="p-4 border border-gray-200 rounded-lg"><h3 class="text-lg font-semibold mb-3 text-blue-700 border-b pb-2">▼ Rent Scenario</h3><div class="space-y-4"><div id="monthlyRent-container"></div><div id="annualRentIncrease-container"></div><div id="investmentReturnRate-container"></div><fieldset class="mt-2"><legend class="form-label tooltip">Investment Tax (Box 3)<span class="tooltiptext">Tax on net assets (savings/investments) above a threshold (heffingsvrij vermogen, approx €57k/person). Simplified here.</span></legend><div class="flex items-center space-x-4 text-sm"><label><input type="radio" name="investmentTax" value="taxFree" class="mr-1"> Tax-Free</label><label><input type="radio" name="investmentTax" value="taxable" checked class="mr-1"> Taxable</label></div></fieldset></div></div>
+                </div>
+            </aside>
+        </div>
+
+        <footer class="text-center mt-12 py-4 border-t border-gray-200">
+            <p class="text-sm text-gray-500">Disclaimer: This calculator is for illustrative purposes only and not financial advice.</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- Constants & Globals ---
+        const TRANSFER_TAX_RATE = 0.02; 
+        const BOX3_TAX_FREE_THRESHOLD = 0;
+        let netWorthChart, deltaChart;
+
+        // --- DOM Elements ---
+        const el = (id) => document.getElementById(id);
+        const rentFinalNWEl = el('rentFinalNW'), buyFinalNWEl = el('buyFinalNW');
+        const rentingAdvantageValueEl = el('rentingAdvantageValue');
+        const toggleDetailsButton = el('toggleDetailsButton'), detailsSection = el('detailsSection'), detailsArrow = el('detailsArrow');
+        const toggleYearlyDataButton = el('toggleYearlyDataButton'), yearlyDataSection = el('yearlyDataSection'), yearlyDataArrow = el('yearlyDataArrow');
+        const yearlyDataTableBody = el('yearlyDataTableBody');
+        const detailValueElements = { 
+            upfrontCosts: el('detailUpfrontCosts'), loanAmount: el('detailLoanAmount'), monthlyMortgage: el('detailMonthlyMortgage'), 
+            finalHomeValue: el('detailFinalHomeValue'), finalLoanBalance: el('detailFinalLoanBalance'), finalEquity: el('detailFinalEquity'), 
+            initialInvestment: el('detailInitialInvestment'), totalCashInvested: el('detailTotalCashInvested'), totalGrowth: el('detailTotalGrowth'), 
+            totalWealthTax: el('detailTotalWealthTax'), finalInvestments: el('detailFinalInvestments'),
+            totalInterest: el('detailTotalInterest'), totalDeduction: el('detailTotalDeduction'), totalOzb: el('detailTotalOzb'),
+            totalMaintenance: el('detailTotalMaintenance'), totalVve: el('detailTotalVve'), totalRent: el('detailTotalRent')
+        };
+
+        // --- Input Definitions ---
+        const inputsConfig = {
+            timeHorizon: { label: 'Time Horizon (Years)', container: 'timeHorizon-container', min: 1, max: 50, step: 1, value: 30, unit: 'yrs' },
+            purchasePrice: { label: 'Purchase Price (€)', container: 'purchasePrice-container', min: 50000, max: 3000000, step: 10000, value: 800000, unit: '€' },
+            downPayment: { label: 'Down Payment (%)', container: 'downPayment-container', min: 0, max: 100, step: 0.1, value: 0, unit: '%' },
+            mortgageInterestRate: { label: 'Mortgage Interest Rate (%)', container: 'mortgageInterestRate-container', min: 0.5, max: 10, step: 0.01, value: 4.0, unit: '%' },
+            amortization: { label: 'Amortization (Years)', container: 'amortization-container', min: 10, max: 40, step: 1, value: 30, unit: 'yrs' },
+            propertyTaxRate: { label: 'OZB (Property Tax %)', container: 'propertyTaxRate-container', min: 0.01, max: 0.5, step: 0.001, value: 0.06, unit: '%' },
+            maintenanceCosts: { label: 'Maintenance (%/Year)', container: 'maintenanceCosts-container', min: 0, max: 5, step: 0.1, value: 1.0, unit: '%' },
+            vveRate: { label: 'VvE / HOA Fees (%/Year)', container: 'vveRate-container', min: 0, max: 0.5, step: 0.001, value: 0.03, unit: '%' },
+            propertyAppreciationRate: { label: 'Property Appreciation (%/Year)', container: 'propertyAppreciationRate-container', min: -5, max: 15, step: 0.1, value: 7.0, unit: '%' },
+            otherBuyerCostsRate: { label: 'Other Buyer Costs (%)', container: 'otherBuyerCostsRate-container', min: 0, max: 10, step: 0.1, value: 2.0, unit: '%' },
+            effectiveMarginalTaxRate: { label: 'Marginal Tax Rate (%)', container: 'effectiveMarginalTaxRate-container', min: 0, max: 60, step: 0.1, value: 37.0, unit: '%' },
+            monthlyRent: { label: 'Monthly Rent (€)', container: 'monthlyRent-container', min: 500, max: 10000, step: 50, value: 2700, unit: '€' },
+            annualRentIncrease: { label: 'Annual Rent Increase (%)', container: 'annualRentIncrease-container', min: 0, max: 10, step: 0.1, value: 2.9, unit: '%' },
+            investmentReturnRate: { label: 'Investment Return (%/Year)', container: 'investmentReturnRate-container', min: 0, max: 25, step: 0.1, value: 14.0, unit: '%' },
+        };
+
+        // --- Functions ---
+        function createSliderInput(id, config) {
+            const container = el(config.container);
+            container.innerHTML = `
+                <div class="flex justify-between items-center mb-1">
+                    <label for="${id}-slider" class="form-label">${config.label}</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="${id}-number" min="${config.min}" max="${config.max}" step="${config.step}" value="${config.value}" class="form-input">
+                        <span class="text-xs text-gray-500">${config.unit}</span>
+                    </div>
+                </div>
+                <input type="range" id="${id}-slider" min="${config.min}" max="${config.max}" step="${config.step}" value="${config.value}" class="slider">
+            `;
+        }
+
+        function setupInputListeners() {
+            Object.keys(inputsConfig).forEach(id => {
+                const slider = el(`${id}-slider`);
+                const number = el(`${id}-number`);
+                slider.addEventListener('input', () => {
+                    number.value = slider.value;
+                    calculateResults();
+                });
+                number.addEventListener('change', () => {
+                    slider.value = number.value;
+                    calculateResults();
+                });
+            });
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', calculateResults);
+            });
+        }
+
+        function getInputs() {
+            const values = {};
+            for (const id in inputsConfig) {
+                values[id] = parseFloat(el(`${id}-number`).value) || 0;
+            }
+            values.maintenanceBasis = document.querySelector('input[name="maintenanceBasis"]:checked').value;
+            values.investmentTaxType = document.querySelector('input[name="investmentTax"]:checked').value;
+            return values;
+        }
+
+        function formatCurrency(value) { return value.toLocaleString('nl-NL', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
+        function calculateMonthlyMortgage(p, r, t) { if (r <= 0 || t <= 0 || p <= 0) return 0; const monthlyRate = r / 12; const n = t * 12; return p * (monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1); }
+
+        function calculateResults() {
+            const inputs = getInputs();
+            if (inputs.timeHorizon <= 0) return;
+
+            const buyerNetWorthTimeline = [0];
+            const renterNetWorthTimeline = [0];
+            const labels = ['Year 0'];
+            const yearlyData = [];
+
+            const purchasePrice = inputs.purchasePrice;
+            const downPaymentAmount = purchasePrice * (inputs.downPayment / 100);
+            const loanAmount = purchasePrice - downPaymentAmount;
+            const transferTaxAmount = purchasePrice * TRANSFER_TAX_RATE;
+            const otherBuyerCostsAmount = purchasePrice * (inputs.otherBuyerCostsRate / 100);
+            const totalUpfrontBuyerCosts = downPaymentAmount + transferTaxAmount + otherBuyerCostsAmount;
+
+            const monthlyMortgagePayment = calculateMonthlyMortgage(loanAmount, inputs.mortgageInterestRate / 100, inputs.amortization);
+
+            let currentHomeValue = purchasePrice;
+            let currentLoanBalance = loanAmount;
+            let renterInvestedAssets = totalUpfrontBuyerCosts;
+            let currentMonthlyRent = inputs.monthlyRent;
+            
+            let totalWealthTaxPaid = 0, totalExtraCashInvestedByRenter = 0, totalInvestmentGrowth = 0, totalRentPaid = 0;
+            let totalInterestPaid = 0, totalDeductionBenefit = 0, totalOzbPaid = 0, totalMaintenancePaid = 0, totalVvePaid = 0;
+
+
+            buyerNetWorthTimeline[0] = currentHomeValue - currentLoanBalance;
+            renterNetWorthTimeline[0] = renterInvestedAssets;
+            
+            for (let year = 1; year <= inputs.timeHorizon; year++) {
+                labels.push(`Year ${year}`);
+                let interestPaidThisYear = 0, principalPaidThisYear = 0;
+                
+                if (currentLoanBalance > 0 && year <= inputs.amortization) {
+                    for (let month = 1; month <= 12; month++) {
+                        if (currentLoanBalance <= 0) break;
+                        const monthlyInterest = currentLoanBalance * ((inputs.mortgageInterestRate / 100) / 12);
+                        let monthlyPrincipal = monthlyMortgagePayment - monthlyInterest;
+                        if (monthlyPrincipal > currentLoanBalance) { monthlyPrincipal = currentLoanBalance; }
+                        interestPaidThisYear += monthlyInterest; principalPaidThisYear += monthlyPrincipal; currentLoanBalance -= monthlyPrincipal;
+                    }
+                }
+                if (currentLoanBalance < 0) currentLoanBalance = 0;
+                
+                currentHomeValue *= (1 + (inputs.propertyAppreciationRate / 100));
+                
+                const recurringCostBaseValue = inputs.maintenanceBasis === 'current' ? currentHomeValue : purchasePrice;
+                const maintenanceCost = recurringCostBaseValue * (inputs.maintenanceCosts / 100);
+                const vveCost = recurringCostBaseValue * (inputs.vveRate / 100);
+                const ozbCost = currentHomeValue * (inputs.propertyTaxRate / 100);
+                const mortgageInterestDeductionBenefit = (year <= inputs.amortization) ? (interestPaidThisYear * (inputs.effectiveMarginalTaxRate / 100)) : 0;
+                const actualAnnualMortgagePayment = principalPaidThisYear + interestPaidThisYear;
+                const buyerAnnualCashOutflow = actualAnnualMortgagePayment + ozbCost + maintenanceCost + vveCost - mortgageInterestDeductionBenefit;
+                
+                totalInterestPaid += interestPaidThisYear;
+                totalDeductionBenefit += mortgageInterestDeductionBenefit;
+                totalOzbPaid += ozbCost;
+                totalMaintenancePaid += maintenanceCost;
+                totalVvePaid += vveCost;
+
+                const currentBuyerNetWorth = currentHomeValue - currentLoanBalance;
+                buyerNetWorthTimeline.push(currentBuyerNetWorth);
+
+                const renterAnnualCashOutflow = currentMonthlyRent * 12;
+                totalRentPaid += renterAnnualCashOutflow;
+
+                const cashFlowDifferenceRenterVsBuyer = buyerAnnualCashOutflow - renterAnnualCashOutflow;
+                renterInvestedAssets += cashFlowDifferenceRenterVsBuyer;
+                totalExtraCashInvestedByRenter += cashFlowDifferenceRenterVsBuyer;
+                
+                const investmentReturn = renterInvestedAssets * (inputs.investmentReturnRate / 100);
+                renterInvestedAssets += investmentReturn;
+                totalInvestmentGrowth += investmentReturn;
+
+                if (inputs.investmentTaxType === 'taxable' && renterInvestedAssets > BOX3_TAX_FREE_THRESHOLD) {
+                    const wealthTax = (renterInvestedAssets - BOX3_TAX_FREE_THRESHOLD) * 0.015;
+                    renterInvestedAssets -= wealthTax; totalWealthTaxPaid += wealthTax;
+                }
+                renterNetWorthTimeline.push(renterInvestedAssets);
+                
+                yearlyData.push({ year, house_rent_pm: currentMonthlyRent, yearly_rent: renterAnnualCashOutflow, yearly_invested: cashFlowDifferenceRenterVsBuyer, investment_growth: investmentReturn, renter_net_worth: renterInvestedAssets, house_value: currentHomeValue, yearly_costs_p_i: actualAnnualMortgagePayment, yearly_interest: interestPaidThisYear, tax_deduction: mortgageInterestDeductionBenefit, net_interest_cost: interestPaidThisYear - mortgageInterestDeductionBenefit, property_tax: ozbCost, maintenance: maintenanceCost, vve: vveCost, buyer_net_worth: currentBuyerNetWorth, advantage: renterInvestedAssets - currentBuyerNetWorth });
+                currentMonthlyRent *= (1 + (inputs.annualRentIncrease / 100));
+            }
+
+            const deltaNetWorthTimeline = renterNetWorthTimeline.map((rentNW, i) => rentNW - buyerNetWorthTimeline[i]);
+            const finalRentNW = renterNetWorthTimeline[inputs.timeHorizon];
+            const finalBuyNW = buyerNetWorthTimeline[inputs.timeHorizon];
+            const advantage = finalRentNW - finalBuyNW;
+            
+            rentFinalNWEl.textContent = formatCurrency(finalRentNW);
+            buyFinalNWEl.textContent = formatCurrency(finalBuyNW);
+            rentingAdvantageValueEl.textContent = advantage >= 0 ? `Renting is better by ${formatCurrency(advantage)}` : `Buying is better by ${formatCurrency(Math.abs(advantage))}`;
+            rentingAdvantageValueEl.className = advantage >= 0 ? "text-3xl font-bold text-blue-600" : "text-3xl font-bold text-green-600";
+            
+            // Update all detail fields
+            detailValueElements.upfrontCosts.textContent = formatCurrency(totalUpfrontBuyerCosts);
+            detailValueElements.loanAmount.textContent = formatCurrency(loanAmount);
+            detailValueElements.monthlyMortgage.textContent = formatCurrency(monthlyMortgagePayment);
+            detailValueElements.finalHomeValue.textContent = formatCurrency(currentHomeValue);
+            detailValueElements.finalLoanBalance.textContent = formatCurrency(currentLoanBalance);
+            detailValueElements.finalEquity.textContent = formatCurrency(finalBuyNW);
+            detailValueElements.initialInvestment.textContent = formatCurrency(totalUpfrontBuyerCosts);
+            detailValueElements.totalCashInvested.textContent = formatCurrency(totalExtraCashInvestedByRenter);
+            detailValueElements.totalGrowth.textContent = formatCurrency(totalInvestmentGrowth);
+            detailValueElements.totalWealthTax.textContent = formatCurrency(totalWealthTaxPaid);
+            detailValueElements.finalInvestments.textContent = formatCurrency(finalRentNW);
+            detailValueElements.totalInterest.textContent = formatCurrency(totalInterestPaid);
+            detailValueElements.totalDeduction.textContent = formatCurrency(totalDeductionBenefit);
+            detailValueElements.totalOzb.textContent = formatCurrency(totalOzbPaid);
+            detailValueElements.totalMaintenance.textContent = formatCurrency(totalMaintenancePaid);
+            detailValueElements.totalVve.textContent = formatCurrency(totalVvePaid);
+            detailValueElements.totalRent.textContent = formatCurrency(totalRentPaid);
+
+
+            updateChart(labels, buyerNetWorthTimeline, renterNetWorthTimeline);
+            updateDeltaChart(labels, deltaNetWorthTimeline);
+            populateYearlyTable(yearlyData);
+        }
+
+        function populateYearlyTable(data) {
+            yearlyDataTableBody.innerHTML = '';
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                const advantageClass = item.advantage >= 0 ? 'text-blue-600' : 'text-green-600';
+                row.className = 'bg-white border-b hover:bg-gray-50 text-right';
+                row.innerHTML = `<td class="py-2 px-4 font-medium text-gray-900 text-center">${item.year}</td><td class="py-2 px-3 border-l border-gray-300">${formatCurrency(item.house_rent_pm)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_rent)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_invested)}</td><td class="py-2 px-3">${formatCurrency(item.investment_growth)}</td><td class="py-2 px-3 font-semibold">${formatCurrency(item.renter_net_worth)}</td><td class="py-2 px-3 border-l border-gray-300">${formatCurrency(item.house_value)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_costs_p_i)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_interest)}</td><td class="py-2 px-3 text-green-600">${formatCurrency(item.tax_deduction)}</td><td class="py-2 px-3">${formatCurrency(item.net_interest_cost)}</td><td class="py-2 px-3">${formatCurrency(item.property_tax)}</td><td class="py-2 px-3">${formatCurrency(item.maintenance)}</td><td class="py-2 px-3">${formatCurrency(item.vve)}</td><td class="py-2 px-3 font-semibold">${formatCurrency(item.buyer_net_worth)}</td><td class="py-2 px-4 font-semibold border-l border-gray-300 ${advantageClass}">${formatCurrency(item.advantage)}</td>`;
+                yearlyDataTableBody.appendChild(row);
+            });
+        }
+        
+        function updateChart(labels, buyData, rentData) {
+            const ctx = document.getElementById('netWorthChart').getContext('2d');
+            if (netWorthChart) { netWorthChart.destroy(); }
+            netWorthChart = new Chart(ctx, {
+                type: 'line', data: { labels, datasets: [ { label: 'Buying Net Worth (Equity)', data: buyData, borderColor: 'rgb(22, 163, 74)', backgroundColor: 'rgba(22, 163, 74, 0.1)', fill: true, tension: 0.1 }, { label: 'Renting Net Worth (Investments)', data: rentData, borderColor: 'rgb(59, 130, 246)', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: (value) => formatCurrency(value) }}}, plugins: { legend: { position: 'top', }, title: { display: true, text: 'Projected Net Worth Over Time'}, tooltip: { callbacks: { label: (context) => (context.dataset.label || '') + ': ' + formatCurrency(context.parsed.y)}}} }
+            });
+        }
+        
+        function updateDeltaChart(labels, deltaData) {
+            const ctx = document.getElementById('deltaChart').getContext('2d');
+            if (deltaChart) { deltaChart.destroy(); }
+            deltaChart = new Chart(ctx, {
+                type: 'line', data: { labels, datasets: [{ label: 'Advantage (Rent - Buy)', data: deltaData, fill: true, tension: 0.1, segment: { borderColor: ctx => 'rgb(124, 58, 237, 0.8)', backgroundColor: ctx => ctx.p1.raw >= 0 ? 'rgba(59, 130, 246, 0.3)' : 'rgba(22, 163, 74, 0.3)', } }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Net Worth Advantage (Positive = Renting is Better)' }, tooltip: { callbacks: { label: (context) => 'Advantage: ' + formatCurrency(context.parsed.y) } } }, scales: { y: { ticks: { callback: (value) => formatCurrency(value) }, grid: { color: (c) => c.tick.value === 0 ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.1)', lineWidth: (c) => c.tick.value === 0 ? 1.5 : 1, } } } }
+            });
+        }
+
+        // --- Event Listeners & Initial Load ---
+        toggleDetailsButton.addEventListener('click', () => { const isHidden = detailsSection.classList.toggle('hidden'); detailsArrow.textContent = isHidden ? '▼' : '▲'; });
+        toggleYearlyDataButton.addEventListener('click', () => { const isHidden = yearlyDataSection.classList.toggle('hidden'); yearlyDataArrow.textContent = isHidden ? '▼' : '▲'; });
+
+        window.onload = () => {
+            Object.keys(inputsConfig).forEach(id => createSliderInput(id, inputsConfig[id]));
+            setupInputListeners();
+            calculateResults();
+        };
+    </script>
+</body>
+</html>
