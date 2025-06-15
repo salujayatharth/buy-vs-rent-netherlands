@@ -42,9 +42,14 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
     <div class="container mx-auto p-4 md:p-8">
-        <header class="text-center mb-6">
-            <h1 class="text-3xl md:text-4xl font-bold text-indigo-600">Interactive Rent vs. Buy Calculator</h1>
-            <p class="text-lg text-gray-600">Netherlands Edition</p>
+        <header class="flex justify-between items-center mb-6">
+            <div class="text-center flex-1">
+                <h1 class="text-3xl md:text-4xl font-bold text-indigo-600">Interactive Rent vs. Buy Calculator</h1>
+                <p class="text-lg text-gray-600">Netherlands Edition</p>
+            </div>
+            <button id="resetButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                Reset to Defaults
+            </button>
         </header>
 
         <div class="flex flex-col lg:flex-row gap-8">
@@ -164,6 +169,7 @@
         const toggleDetailsButton = el('toggleDetailsButton'), detailsSection = el('detailsSection'), detailsArrow = el('detailsArrow');
         const toggleYearlyDataButton = el('toggleYearlyDataButton'), yearlyDataSection = el('yearlyDataSection'), yearlyDataArrow = el('yearlyDataArrow');
         const yearlyDataTableBody = el('yearlyDataTableBody');
+        const resetButton = el('resetButton');
         const detailValueElements = { 
             upfrontCosts: el('detailUpfrontCosts'), loanAmount: el('detailLoanAmount'), monthlyMortgage: el('detailMonthlyMortgage'), 
             finalHomeValue: el('detailFinalHomeValue'), finalLoanBalance: el('detailFinalLoanBalance'), finalEquity: el('detailFinalEquity'), 
@@ -386,9 +392,33 @@
             });
         }
 
+        function resetToDefaults() {
+            // Reset all input sliders and number fields to default values
+            Object.keys(inputsConfig).forEach(id => {
+                const config = inputsConfig[id];
+                const slider = el(`${id}-slider`);
+                const number = el(`${id}-number`);
+                if (slider && number) {
+                    slider.value = config.value;
+                    number.value = config.value;
+                }
+            });
+            
+            // Reset radio buttons to default values
+            const maintenanceBasisCurrent = document.querySelector('input[name="maintenanceBasis"][value="current"]');
+            const investmentTaxTaxable = document.querySelector('input[name="investmentTax"][value="taxable"]');
+            
+            if (maintenanceBasisCurrent) maintenanceBasisCurrent.checked = true;
+            if (investmentTaxTaxable) investmentTaxTaxable.checked = true;
+            
+            // Recalculate results with default values
+            calculateResults();
+        }
+
         // --- Event Listeners & Initial Load ---
         toggleDetailsButton.addEventListener('click', () => { const isHidden = detailsSection.classList.toggle('hidden'); detailsArrow.textContent = isHidden ? '▼' : '▲'; });
         toggleYearlyDataButton.addEventListener('click', () => { const isHidden = yearlyDataSection.classList.toggle('hidden'); yearlyDataArrow.textContent = isHidden ? '▼' : '▲'; });
+        resetButton.addEventListener('click', resetToDefaults);
 
         window.onload = () => {
             Object.keys(inputsConfig).forEach(id => createSliderInput(id, inputsConfig[id]));
