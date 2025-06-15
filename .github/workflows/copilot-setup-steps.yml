@@ -28,29 +28,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Google Chrome
-        run: |
-          echo "Installing Google Chrome for screenshot functionality..."
-          # Update package list
-          sudo apt-get update
-          
-          # Install dependencies
-          sudo apt-get install -y wget gnupg
-          
-          # Add Google Chrome repository
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-          
-          # Update package list with Chrome repository
-          sudo apt-get update
-          
-          # Install Google Chrome
-          sudo apt-get install -y google-chrome-stable
-          
-          # Verify installation
-          google-chrome --version
-          echo "✓ Google Chrome installed successfully"
-
       - name: Verify main HTML file exists
         run: |
           if [ -f "index.html" ]; then
@@ -152,17 +129,6 @@ jobs:
             echo "⚠ Calculate results function not found"
           fi
 
-      - name: Test Chrome headless functionality
-        run: |
-          echo "Testing Chrome headless functionality for screenshot capability..."
-          # Test if Chrome can run in headless mode (typical for screenshots)
-          timeout 10 google-chrome --headless --disable-gpu --no-sandbox --dump-dom about:blank > /dev/null 2>&1
-          if [ $? -eq 0 ]; then
-            echo "✓ Chrome headless mode working - ready for screenshots"
-          else
-            echo "⚠ Chrome headless mode test timed out or failed"
-          fi
-
       - name: Environment summary
         run: |
           echo "=== Environment Summary ==="
@@ -171,7 +137,6 @@ jobs:
           echo "- Node.js: $(node --version 2>/dev/null || echo 'Not available')"
           echo "- Python: $(python3 --version 2>/dev/null || echo 'Not available')"
           echo "- Git: $(git --version)"
-          echo "- Google Chrome: $(google-chrome --version 2>/dev/null || echo 'Not available')"
           echo ""
           echo "Repository contents:"
           find . -maxdepth 2 -type f | grep -v '.git' | sort
