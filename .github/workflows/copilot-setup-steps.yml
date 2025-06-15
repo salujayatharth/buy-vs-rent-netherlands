@@ -1,0 +1,145 @@
+name: "Copilot Setup Steps"
+
+# Automatically run the setup steps when they are changed to allow for easy validation, and
+# allow manual testing through the repository's "Actions" tab
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  # The job MUST be called `copilot-setup-steps` or it will not be picked up by Copilot.
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+
+    # Set the permissions to the lowest permissions possible needed for your steps.
+    # Copilot will be given its own token for its operations.
+    permissions:
+      # If you want to clone the repository as part of your setup steps, for example to install dependencies, you'll need the `contents: read` permission. If you don't clone the repository in your setup steps, Copilot will do this for you automatically after the steps complete.
+      contents: read
+
+    # You can define any steps you want, and they will run before the agent starts.
+    # If you do not check out your code, Copilot will do this for you.
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify main HTML file exists
+        run: |
+          if [ -f "index.html" ]; then
+            echo "✓ Main HTML file found at index.html"
+            ls -lh index.html
+          else
+            echo "✗ Main HTML file not found at index.html"
+            echo "Available files in root directory:"
+            ls -la . || echo "Could not list directory contents"
+            exit 1
+          fi
+
+      - name: Check HTML structure
+        run: |
+          echo "Checking HTML file structure..."
+          if grep -q "<!DOCTYPE html>" index.html; then
+            echo "✓ HTML DOCTYPE declaration found"
+          else
+            echo "⚠ HTML DOCTYPE declaration not found"
+          fi
+          
+          if grep -q "<title>" index.html; then
+            echo "✓ HTML title tag found"
+            title=$(grep -o '<title>[^<]*' index.html | sed 's/<title>//')
+            echo "  Title: $title"
+          else
+            echo "⚠ HTML title tag not found"
+          fi
+
+      - name: Verify external dependencies
+        run: |
+          echo "Checking external CDN dependencies..."
+          if grep -q "tailwindcss.com" index.html; then
+            echo "✓ Tailwind CSS CDN link found"
+          else
+            echo "⚠ Tailwind CSS CDN link not found"
+          fi
+          
+          if grep -q "chart.js" index.html; then
+            echo "✓ Chart.js CDN link found"
+          else
+            echo "⚠ Chart.js CDN link not found"
+          fi
+
+      - name: Run basic HTML validation
+        run: |
+          echo "Running basic HTML structure checks..."
+          # Check for basic HTML structure
+          if grep -q "<html" index.html && grep -q "</html>" index.html; then
+            echo "✓ HTML root element structure is valid"
+          else
+            echo "✗ HTML root element structure is invalid"
+            exit 1
+          fi
+          
+          if grep -q "<head" index.html && grep -q "</head>" index.html; then
+            echo "✓ HTML head section is present"
+          else
+            echo "✗ HTML head section is missing"
+            exit 1
+          fi
+          
+          if grep -q "<body" index.html && grep -q "</body>" index.html; then
+            echo "✓ HTML body section is present"
+          else
+            echo "✗ HTML body section is missing"
+            exit 1
+          fi
+
+      - name: Check for JavaScript functionality
+        run: |
+          echo "Checking for JavaScript code..."
+          if grep -q "<script" index.html; then
+            echo "✓ JavaScript code found in HTML file"
+            script_count=$(grep -c "<script" index.html)
+            echo "  Found $script_count script tags"
+          else
+            echo "⚠ No JavaScript code found"
+          fi
+
+      - name: Verify calculator components
+        run: |
+          echo "Checking for rent vs buy calculator components..."
+          if grep -q "purchasePrice" index.html; then
+            echo "✓ Purchase price component found"
+          else
+            echo "⚠ Purchase price component not found"
+          fi
+          
+          if grep -q "monthlyRent" index.html; then
+            echo "✓ Monthly rent component found"
+          else
+            echo "⚠ Monthly rent component not found"
+          fi
+          
+          if grep -q "calculateResults" index.html; then
+            echo "✓ Calculate results function found"
+          else
+            echo "⚠ Calculate results function not found"
+          fi
+
+      - name: Environment summary
+        run: |
+          echo "=== Environment Summary ==="
+          echo "OS: $(uname -a)"
+          echo "Available tools:"
+          echo "- Node.js: $(node --version 2>/dev/null || echo 'Not available')"
+          echo "- Python: $(python3 --version 2>/dev/null || echo 'Not available')"
+          echo "- Git: $(git --version)"
+          echo ""
+          echo "Repository contents:"
+          find . -maxdepth 2 -type f | grep -v '.git' | sort
+          echo ""
+          echo "HTML file size: $(du -h index.html)"
+          echo "=== Setup Complete ==="
