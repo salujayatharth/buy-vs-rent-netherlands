@@ -38,6 +38,17 @@
         .sidebar {
              max-height: calc(100vh - 4rem); /* Adjust based on your header/footer height */
         }
+        /* Smooth transitions for animated values */
+        .animate-value {
+            transition: all 0.3s ease-in-out;
+        }
+        .animate-color {
+            transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+        /* Smooth table updates */
+        #yearlyDataTableBody {
+            transition: opacity 0.2s ease-in-out;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -52,12 +63,12 @@
             <main class="lg:w-2/3 w-full">
                 <!-- Results Summary -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div class="bg-blue-50 p-6 rounded-lg shadow"><h3 class="text-xl font-semibold text-blue-700 mb-2">Renting Scenario</h3><p class="text-3xl font-bold text-blue-600" id="rentFinalNW">€0</p><p class="text-sm text-gray-500">Projected Net Worth</p></div>
-                    <div class="bg-green-50 p-6 rounded-lg shadow"><h3 class="text-xl font-semibold text-green-700 mb-2">Buying Scenario</h3><p class="text-3xl font-bold text-green-600" id="buyFinalNW">€0</p><p class="text-sm text-gray-500">Projected Net Worth (Equity)</p></div>
+                    <div class="bg-blue-50 p-6 rounded-lg shadow"><h3 class="text-xl font-semibold text-blue-700 mb-2">Renting Scenario</h3><p class="text-3xl font-bold text-blue-600 animate-value" id="rentFinalNW">€0</p><p class="text-sm text-gray-500">Projected Net Worth</p></div>
+                    <div class="bg-green-50 p-6 rounded-lg shadow"><h3 class="text-xl font-semibold text-green-700 mb-2">Buying Scenario</h3><p class="text-3xl font-bold text-green-600 animate-value" id="buyFinalNW">€0</p><p class="text-sm text-gray-500">Projected Net Worth (Equity)</p></div>
                 </div>
                 <div class="text-center mb-6 p-4 bg-indigo-50 rounded-lg shadow">
                     <h3 class="text-xl font-semibold text-indigo-700">Advantage After Time Horizon</h3>
-                    <p class="text-3xl font-bold text-indigo-600" id="rentingAdvantageValue">€0</p>
+                    <p class="text-3xl font-bold text-indigo-600 animate-value animate-color" id="rentingAdvantageValue">€0</p>
                 </div>
 
                 <!-- Charts -->
@@ -74,36 +85,36 @@
                             <div>
                                 <h3 class="text-xl font-semibold text-green-700 mb-4 border-b pb-2">Buying Breakdown</h3>
                                 <div class="space-y-2 text-sm">
-                                    <p class="flex justify-between"><span>Initial Upfront Costs:</span><strong id="detailUpfrontCosts">€0</strong></p>
-                                    <p class="flex justify-between"><span>Initial Loan Amount:</span><strong id="detailLoanAmount">€0</strong></p>
-                                    <p class="flex justify-between"><span>Monthly Mortgage (P&I):</span><strong id="detailMonthlyMortgage">€0</strong></p>
+                                    <p class="flex justify-between"><span>Initial Upfront Costs:</span><strong class="animate-value" id="detailUpfrontCosts">€0</strong></p>
+                                    <p class="flex justify-between"><span>Initial Loan Amount:</span><strong class="animate-value" id="detailLoanAmount">€0</strong></p>
+                                    <p class="flex justify-between"><span>Monthly Mortgage (P&I):</span><strong class="animate-value" id="detailMonthlyMortgage">€0</strong></p>
                                     <hr class="my-2 border-gray-300">
                                     <h4 class="font-semibold text-gray-600 pt-1">Total Costs Over Period</h4>
-                                    <p class="flex justify-between pl-2"><span>Mortgage Interest Paid:</span><strong id="detailTotalInterest">€0</strong></p>
-                                    <p class="flex justify-between pl-2 text-green-600"><span>Tax Deduction Benefit:</span><strong id="detailTotalDeduction">€0</strong></p>
-                                    <p class="flex justify-between pl-2"><span>Property Tax (OZB):</span><strong id="detailTotalOzb">€0</strong></p>
-                                    <p class="flex justify-between pl-2"><span>Maintenance:</span><strong id="detailTotalMaintenance">€0</strong></p>
-                                    <p class="flex justify-between pl-2"><span>VvE Fees:</span><strong id="detailTotalVve">€0</strong></p>
+                                    <p class="flex justify-between pl-2"><span>Mortgage Interest Paid:</span><strong class="animate-value" id="detailTotalInterest">€0</strong></p>
+                                    <p class="flex justify-between pl-2 text-green-600"><span>Tax Deduction Benefit:</span><strong class="animate-value" id="detailTotalDeduction">€0</strong></p>
+                                    <p class="flex justify-between pl-2"><span>Property Tax (OZB):</span><strong class="animate-value" id="detailTotalOzb">€0</strong></p>
+                                    <p class="flex justify-between pl-2"><span>Maintenance:</span><strong class="animate-value" id="detailTotalMaintenance">€0</strong></p>
+                                    <p class="flex justify-between pl-2"><span>VvE Fees:</span><strong class="animate-value" id="detailTotalVve">€0</strong></p>
                                     <hr class="my-2 border-gray-300">
                                     <h4 class="font-semibold text-gray-600 pt-1">Final Outcome</h4>
-                                    <p class="flex justify-between"><span>Final Home Value:</span><strong id="detailFinalHomeValue">€0</strong></p>
-                                    <p class="flex justify-between"><span>Final Loan Balance:</span><strong id="detailFinalLoanBalance">€0</strong></p>
-                                    <p class="flex justify-between font-bold text-base pt-1"><span>Final Equity (Net Worth):</span><strong id="detailFinalEquity">€0</strong></p>
+                                    <p class="flex justify-between"><span>Final Home Value:</span><strong class="animate-value" id="detailFinalHomeValue">€0</strong></p>
+                                    <p class="flex justify-between"><span>Final Loan Balance:</span><strong class="animate-value" id="detailFinalLoanBalance">€0</strong></p>
+                                    <p class="flex justify-between font-bold text-base pt-1"><span>Final Equity (Net Worth):</span><strong class="animate-value" id="detailFinalEquity">€0</strong></p>
                                 </div>
                             </div>
                             <div>
                                 <h3 class="text-xl font-semibold text-blue-700 mb-4 border-b pb-2">Renting Breakdown</h3>
                                 <div class="space-y-2 text-sm">
-                                    <p class="flex justify-between"><span>Initial Investment:</span><strong id="detailInitialInvestment">€0</strong></p>
-                                    <p class="flex justify-between"><span>Extra Cash Invested:</span><strong id="detailTotalCashInvested">€0</strong></p>
-                                    <p class="flex justify-between"><span>Investment Growth:</span><strong id="detailTotalGrowth">€0</strong></p>
+                                    <p class="flex justify-between"><span>Initial Investment:</span><strong class="animate-value" id="detailInitialInvestment">€0</strong></p>
+                                    <p class="flex justify-between"><span>Extra Cash Invested:</span><strong class="animate-value" id="detailTotalCashInvested">€0</strong></p>
+                                    <p class="flex justify-between"><span>Investment Growth:</span><strong class="animate-value" id="detailTotalGrowth">€0</strong></p>
                                     <hr class="my-2 border-gray-300">
                                     <h4 class="font-semibold text-gray-600 pt-1">Total Costs Over Period</h4>
-                                    <p class="flex justify-between pl-2"><span>Total Rent Paid:</span><strong id="detailTotalRent">€0</strong></p>
-                                    <p class="flex justify-between pl-2"><span>Wealth Tax Paid (Box 3):</span><strong id="detailTotalWealthTax">€0</strong></p>
+                                    <p class="flex justify-between pl-2"><span>Total Rent Paid:</span><strong class="animate-value" id="detailTotalRent">€0</strong></p>
+                                    <p class="flex justify-between pl-2"><span>Wealth Tax Paid (Box 3):</span><strong class="animate-value" id="detailTotalWealthTax">€0</strong></p>
                                     <hr class="my-2 border-gray-300">
                                     <h4 class="font-semibold text-gray-600 pt-1">Final Outcome</h4>
-                                    <p class="flex justify-between font-bold text-base pt-1"><span>Final Investments (Net Worth):</span><strong id="detailFinalInvestments">€0</strong></p>
+                                    <p class="flex justify-between font-bold text-base pt-1"><span>Final Investments (Net Worth):</span><strong class="animate-value" id="detailFinalInvestments">€0</strong></p>
                                 </div>
                             </div>
                         </div>
@@ -156,6 +167,42 @@
         const TRANSFER_TAX_RATE = 0.02; 
         const BOX3_TAX_FREE_THRESHOLD = 0;
         let netWorthChart, deltaChart;
+        let animationTimeout = null;
+
+        // Animation helper functions
+        function animateNumber(element, targetValue, duration = 300) {
+            const startValue = parseFloat(element.textContent.replace(/[€.,]/g, '')) || 0;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ease-out animation curve
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                const currentValue = startValue + (targetValue - startValue) * easeProgress;
+                
+                element.textContent = formatCurrency(currentValue);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+
+        function animateTextWithColor(element, targetText, targetClass, duration = 300) {
+            // Smooth transition for text and color changes
+            element.style.transition = 'opacity 0.15s ease-in-out';
+            element.style.opacity = '0.6';
+            
+            setTimeout(() => {
+                element.textContent = targetText;
+                element.className = targetClass + ' animate-value animate-color';
+                element.style.opacity = '1';
+            }, 150);
+        }
 
         // --- DOM Elements ---
         const el = (id) => document.getElementById(id);
@@ -212,16 +259,25 @@
                 const number = el(`${id}-number`);
                 slider.addEventListener('input', () => {
                     number.value = slider.value;
-                    calculateResults();
+                    debouncedCalculateResults();
                 });
                 number.addEventListener('change', () => {
                     slider.value = number.value;
-                    calculateResults();
+                    debouncedCalculateResults();
                 });
             });
             document.querySelectorAll('input[type="radio"]').forEach(radio => {
-                radio.addEventListener('change', calculateResults);
+                radio.addEventListener('change', debouncedCalculateResults);
             });
+        }
+
+        function debouncedCalculateResults() {
+            if (animationTimeout) {
+                clearTimeout(animationTimeout);
+            }
+            animationTimeout = setTimeout(() => {
+                calculateResults();
+            }, 30); // Reduced delay for more responsive feel while still preventing excessive calculations
         }
 
         function getInputs() {
@@ -327,29 +383,33 @@
             const finalBuyNW = buyerNetWorthTimeline[inputs.timeHorizon];
             const advantage = finalRentNW - finalBuyNW;
             
-            rentFinalNWEl.textContent = formatCurrency(finalRentNW);
-            buyFinalNWEl.textContent = formatCurrency(finalBuyNW);
-            rentingAdvantageValueEl.textContent = advantage >= 0 ? `Renting is better by ${formatCurrency(advantage)}` : `Buying is better by ${formatCurrency(Math.abs(advantage))}`;
-            rentingAdvantageValueEl.className = advantage >= 0 ? "text-3xl font-bold text-blue-600" : "text-3xl font-bold text-green-600";
+            // Animate the main summary values with smooth transitions
+            animateNumber(rentFinalNWEl, finalRentNW);
+            animateNumber(buyFinalNWEl, finalBuyNW);
             
-            // Update all detail fields
-            detailValueElements.upfrontCosts.textContent = formatCurrency(totalUpfrontBuyerCosts);
-            detailValueElements.loanAmount.textContent = formatCurrency(loanAmount);
-            detailValueElements.monthlyMortgage.textContent = formatCurrency(monthlyMortgagePayment);
-            detailValueElements.finalHomeValue.textContent = formatCurrency(currentHomeValue);
-            detailValueElements.finalLoanBalance.textContent = formatCurrency(currentLoanBalance);
-            detailValueElements.finalEquity.textContent = formatCurrency(finalBuyNW);
-            detailValueElements.initialInvestment.textContent = formatCurrency(totalUpfrontBuyerCosts);
-            detailValueElements.totalCashInvested.textContent = formatCurrency(totalExtraCashInvestedByRenter);
-            detailValueElements.totalGrowth.textContent = formatCurrency(totalInvestmentGrowth);
-            detailValueElements.totalWealthTax.textContent = formatCurrency(totalWealthTaxPaid);
-            detailValueElements.finalInvestments.textContent = formatCurrency(finalRentNW);
-            detailValueElements.totalInterest.textContent = formatCurrency(totalInterestPaid);
-            detailValueElements.totalDeduction.textContent = formatCurrency(totalDeductionBenefit);
-            detailValueElements.totalOzb.textContent = formatCurrency(totalOzbPaid);
-            detailValueElements.totalMaintenance.textContent = formatCurrency(totalMaintenancePaid);
-            detailValueElements.totalVve.textContent = formatCurrency(totalVvePaid);
-            detailValueElements.totalRent.textContent = formatCurrency(totalRentPaid);
+            // Animate the advantage text and color change
+            const advantageText = advantage >= 0 ? `Renting is better by ${formatCurrency(advantage)}` : `Buying is better by ${formatCurrency(Math.abs(advantage))}`;
+            const advantageClass = advantage >= 0 ? "text-3xl font-bold text-blue-600" : "text-3xl font-bold text-green-600";
+            animateTextWithColor(rentingAdvantageValueEl, advantageText, advantageClass);
+            
+            // Update all detail fields with animation
+            animateNumber(detailValueElements.upfrontCosts, totalUpfrontBuyerCosts);
+            animateNumber(detailValueElements.loanAmount, loanAmount);
+            animateNumber(detailValueElements.monthlyMortgage, monthlyMortgagePayment);
+            animateNumber(detailValueElements.finalHomeValue, currentHomeValue);
+            animateNumber(detailValueElements.finalLoanBalance, currentLoanBalance);
+            animateNumber(detailValueElements.finalEquity, finalBuyNW);
+            animateNumber(detailValueElements.initialInvestment, totalUpfrontBuyerCosts);
+            animateNumber(detailValueElements.totalCashInvested, totalExtraCashInvestedByRenter);
+            animateNumber(detailValueElements.totalGrowth, totalInvestmentGrowth);
+            animateNumber(detailValueElements.totalWealthTax, totalWealthTaxPaid);
+            animateNumber(detailValueElements.finalInvestments, finalRentNW);
+            animateNumber(detailValueElements.totalInterest, totalInterestPaid);
+            animateNumber(detailValueElements.totalDeduction, totalDeductionBenefit);
+            animateNumber(detailValueElements.totalOzb, totalOzbPaid);
+            animateNumber(detailValueElements.totalMaintenance, totalMaintenancePaid);
+            animateNumber(detailValueElements.totalVve, totalVvePaid);
+            animateNumber(detailValueElements.totalRent, totalRentPaid);
 
 
             updateChart(labels, buyerNetWorthTimeline, renterNetWorthTimeline);
@@ -358,32 +418,135 @@
         }
 
         function populateYearlyTable(data) {
-            yearlyDataTableBody.innerHTML = '';
-            data.forEach(item => {
-                const row = document.createElement('tr');
-                const advantageClass = item.advantage >= 0 ? 'text-blue-600' : 'text-green-600';
-                row.className = 'bg-white border-b hover:bg-gray-50 text-right';
-                row.innerHTML = `<td class="py-2 px-4 font-medium text-gray-900 text-center">${item.year}</td><td class="py-2 px-3 border-l border-gray-300">${formatCurrency(item.house_rent_pm)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_rent)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_invested)}</td><td class="py-2 px-3">${formatCurrency(item.investment_growth)}</td><td class="py-2 px-3 font-semibold">${formatCurrency(item.renter_net_worth)}</td><td class="py-2 px-3 border-l border-gray-300">${formatCurrency(item.house_value)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_costs_p_i)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_interest)}</td><td class="py-2 px-3 text-green-600">${formatCurrency(item.tax_deduction)}</td><td class="py-2 px-3">${formatCurrency(item.net_interest_cost)}</td><td class="py-2 px-3">${formatCurrency(item.property_tax)}</td><td class="py-2 px-3">${formatCurrency(item.maintenance)}</td><td class="py-2 px-3">${formatCurrency(item.vve)}</td><td class="py-2 px-3 font-semibold">${formatCurrency(item.buyer_net_worth)}</td><td class="py-2 px-4 font-semibold border-l border-gray-300 ${advantageClass}">${formatCurrency(item.advantage)}</td>`;
-                yearlyDataTableBody.appendChild(row);
-            });
+            // Add fade effect during table update
+            yearlyDataTableBody.style.opacity = '0.7';
+            
+            setTimeout(() => {
+                yearlyDataTableBody.innerHTML = '';
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    const advantageClass = item.advantage >= 0 ? 'text-blue-600' : 'text-green-600';
+                    row.className = 'bg-white border-b hover:bg-gray-50 text-right';
+                    row.innerHTML = `<td class="py-2 px-4 font-medium text-gray-900 text-center">${item.year}</td><td class="py-2 px-3 border-l border-gray-300">${formatCurrency(item.house_rent_pm)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_rent)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_invested)}</td><td class="py-2 px-3">${formatCurrency(item.investment_growth)}</td><td class="py-2 px-3 font-semibold">${formatCurrency(item.renter_net_worth)}</td><td class="py-2 px-3 border-l border-gray-300">${formatCurrency(item.house_value)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_costs_p_i)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_interest)}</td><td class="py-2 px-3 text-green-600">${formatCurrency(item.tax_deduction)}</td><td class="py-2 px-3">${formatCurrency(item.net_interest_cost)}</td><td class="py-2 px-3">${formatCurrency(item.property_tax)}</td><td class="py-2 px-3">${formatCurrency(item.maintenance)}</td><td class="py-2 px-3">${formatCurrency(item.vve)}</td><td class="py-2 px-3 font-semibold">${formatCurrency(item.buyer_net_worth)}</td><td class="py-2 px-4 font-semibold border-l border-gray-300 ${advantageClass}">${formatCurrency(item.advantage)}</td>`;
+                    yearlyDataTableBody.appendChild(row);
+                });
+                
+                // Fade back in
+                yearlyDataTableBody.style.opacity = '1';
+            }, 100);
         }
         
         function updateChart(labels, buyData, rentData) {
             const ctx = document.getElementById('netWorthChart').getContext('2d');
-            if (netWorthChart) { netWorthChart.destroy(); }
-            netWorthChart = new Chart(ctx, {
-                type: 'line', data: { labels, datasets: [ { label: 'Buying Net Worth (Equity)', data: buyData, borderColor: 'rgb(22, 163, 74)', backgroundColor: 'rgba(22, 163, 74, 0.1)', fill: true, tension: 0.1 }, { label: 'Renting Net Worth (Investments)', data: rentData, borderColor: 'rgb(59, 130, 246)', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1 }] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: (value) => formatCurrency(value) }}}, plugins: { legend: { position: 'top', }, title: { display: true, text: 'Projected Net Worth Over Time'}, tooltip: { callbacks: { label: (context) => (context.dataset.label || '') + ': ' + formatCurrency(context.parsed.y)}}} }
-            });
+            if (netWorthChart) {
+                // Update existing chart data with animation
+                netWorthChart.data.labels = labels;
+                netWorthChart.data.datasets[0].data = buyData;
+                netWorthChart.data.datasets[1].data = rentData;
+                netWorthChart.update('active');
+            } else {
+                // Create new chart with animation enabled
+                netWorthChart = new Chart(ctx, {
+                    type: 'line', 
+                    data: { 
+                        labels, 
+                        datasets: [ 
+                            { label: 'Buying Net Worth (Equity)', data: buyData, borderColor: 'rgb(22, 163, 74)', backgroundColor: 'rgba(22, 163, 74, 0.1)', fill: true, tension: 0.1 }, 
+                            { label: 'Renting Net Worth (Investments)', data: rentData, borderColor: 'rgb(59, 130, 246)', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1 }
+                        ] 
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        animation: {
+                            duration: 400,
+                            easing: 'easeInOutQuad'
+                        },
+                        scales: { 
+                            y: { 
+                                ticks: { 
+                                    callback: (value) => formatCurrency(value) 
+                                }
+                            }
+                        }, 
+                        plugins: { 
+                            legend: { 
+                                position: 'top', 
+                            }, 
+                            title: { 
+                                display: true, 
+                                text: 'Projected Net Worth Over Time'
+                            }, 
+                            tooltip: { 
+                                callbacks: { 
+                                    label: (context) => (context.dataset.label || '') + ': ' + formatCurrency(context.parsed.y)
+                                }
+                            }
+                        } 
+                    }
+                });
+            }
         }
         
         function updateDeltaChart(labels, deltaData) {
             const ctx = document.getElementById('deltaChart').getContext('2d');
-            if (deltaChart) { deltaChart.destroy(); }
-            deltaChart = new Chart(ctx, {
-                type: 'line', data: { labels, datasets: [{ label: 'Advantage (Rent - Buy)', data: deltaData, fill: true, tension: 0.1, segment: { borderColor: ctx => 'rgb(124, 58, 237, 0.8)', backgroundColor: ctx => ctx.p1.raw >= 0 ? 'rgba(59, 130, 246, 0.3)' : 'rgba(22, 163, 74, 0.3)', } }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Net Worth Advantage (Positive = Renting is Better)' }, tooltip: { callbacks: { label: (context) => 'Advantage: ' + formatCurrency(context.parsed.y) } } }, scales: { y: { ticks: { callback: (value) => formatCurrency(value) }, grid: { color: (c) => c.tick.value === 0 ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.1)', lineWidth: (c) => c.tick.value === 0 ? 1.5 : 1, } } } }
-            });
+            if (deltaChart) {
+                // Update existing chart data with animation
+                deltaChart.data.labels = labels;
+                deltaChart.data.datasets[0].data = deltaData;
+                deltaChart.update('active');
+            } else {
+                // Create new chart with animation enabled
+                deltaChart = new Chart(ctx, {
+                    type: 'line', 
+                    data: { 
+                        labels, 
+                        datasets: [{
+                            label: 'Advantage (Rent - Buy)', 
+                            data: deltaData, 
+                            fill: true, 
+                            tension: 0.1, 
+                            segment: { 
+                                borderColor: ctx => 'rgb(124, 58, 237, 0.8)', 
+                                backgroundColor: ctx => ctx.p1.raw >= 0 ? 'rgba(59, 130, 246, 0.3)' : 'rgba(22, 163, 74, 0.3)', 
+                            } 
+                        }] 
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        animation: {
+                            duration: 400,
+                            easing: 'easeInOutQuad'
+                        },
+                        plugins: { 
+                            legend: { 
+                                display: false 
+                            }, 
+                            title: { 
+                                display: true, 
+                                text: 'Net Worth Advantage (Positive = Renting is Better)' 
+                            }, 
+                            tooltip: { 
+                                callbacks: { 
+                                    label: (context) => 'Advantage: ' + formatCurrency(context.parsed.y) 
+                                } 
+                            } 
+                        }, 
+                        scales: { 
+                            y: { 
+                                ticks: { 
+                                    callback: (value) => formatCurrency(value) 
+                                }, 
+                                grid: { 
+                                    color: (c) => c.tick.value === 0 ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.1)', 
+                                    lineWidth: (c) => c.tick.value === 0 ? 1.5 : 1, 
+                                } 
+                            } 
+                        } 
+                    }
+                });
+            }
         }
 
         // --- Event Listeners & Initial Load ---
