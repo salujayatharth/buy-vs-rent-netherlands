@@ -63,9 +63,9 @@
             </button>
         </header>
 
-        <div class="flex flex-col lg:flex-row gap-8">
+        <div class="flex flex-col lg:flex-row gap-6">
             <!-- Main Content: Summaries & Charts -->
-            <main class="lg:w-2/3 w-full">
+            <main class="lg:w-3/4 w-full">
                 <!-- Results Summary -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div class="bg-blue-50 p-6 rounded-lg shadow"><h3 class="text-xl font-semibold text-blue-700 mb-2">Renting Scenario</h3><p class="text-3xl font-bold text-blue-600 animate-value" id="rentFinalNW">€0</p><p class="text-sm text-gray-500">Projected Net Worth</p></div>
@@ -144,13 +144,18 @@
                                 <tbody id="yearlyDataTableBody"></tbody>
                             </table>
                         </div>
+                        <div class="mt-4 text-center">
+                            <button id="exportCsvButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                Export as CSV
+                            </button>
+                        </div>
                     </div>
                 </div>
 
             </main>
 
             <!-- Sidebar with Inputs -->
-            <aside class="lg:w-1/3 w-full bg-white p-5 rounded-xl shadow-xl sidebar overflow-y-auto">
+            <aside class="lg:w-1/4 w-full bg-white p-5 rounded-xl shadow-xl sidebar overflow-y-auto">
                 <div class="space-y-5">
                     <!-- Common Assumptions -->
                     <div class="p-4 border border-gray-200 rounded-lg"><h3 class="text-lg font-semibold mb-3 text-gray-700 border-b pb-2">Common Assumptions</h3><div id="timeHorizon-container"></div></div>
@@ -173,6 +178,7 @@
         const BOX3_TAX_FREE_THRESHOLD = 0;
         let netWorthChart, deltaChart;
         let animationTimeout = null;
+        let currentYearlyData = []; // Store current yearly data for CSV export
 
         // Animation helper functions
         function animateNumber(element, targetValue, duration = 300) {
@@ -216,6 +222,7 @@
         const toggleDetailsButton = el('toggleDetailsButton'), detailsSection = el('detailsSection'), detailsArrow = el('detailsArrow');
         const toggleYearlyDataButton = el('toggleYearlyDataButton'), yearlyDataSection = el('yearlyDataSection'), yearlyDataArrow = el('yearlyDataArrow');
         const yearlyDataTableBody = el('yearlyDataTableBody');
+        const exportCsvButton = el('exportCsvButton');
         const resetButton = el('resetButton');
         const detailValueElements = { 
             upfrontCosts: el('detailUpfrontCosts'), loanAmount: el('detailLoanAmount'), monthlyMortgage: el('detailMonthlyMortgage'), 
@@ -355,6 +362,73 @@
                 const radio = document.querySelector(`input[name="investmentTax"][value="${values.investmentTaxType}"]`);
                 if (radio) radio.checked = true;
             }
+
+        }
+
+        function exportToCsv() {
+            if (currentYearlyData.length === 0) {
+                alert('No data to export. Please ensure calculations have been performed.');
+                return;
+            }
+
+            // Define CSV headers
+            const headers = [
+                'Year',
+                'Monthly Rent (€)',
+                'Yearly Rent (€)',
+                'Yearly Invested (€)',
+                'Investment Growth (€)',
+                'Renter Net Worth (€)',
+                'House Value (€)',
+                'EMI P&I (€)',
+                'Interest Paid (€)',
+                'Tax Deduction (€)',
+                'Net Interest Cost (€)',
+                'Property Tax (€)',
+                'Maintenance (€)',
+                'VvE Fees (€)',
+                'Buyer Net Worth (€)',
+                'Advantage (€)'
+            ];
+
+            // Convert data to CSV format
+            const csvRows = [headers.join(',')];
+            
+            currentYearlyData.forEach(item => {
+                const row = [
+                    item.year,
+                    Math.round(item.house_rent_pm),
+                    Math.round(item.yearly_rent),
+                    Math.round(item.yearly_invested),
+                    Math.round(item.investment_growth),
+                    Math.round(item.renter_net_worth),
+                    Math.round(item.house_value),
+                    Math.round(item.yearly_costs_p_i),
+                    Math.round(item.yearly_interest),
+                    Math.round(item.tax_deduction),
+                    Math.round(item.net_interest_cost),
+                    Math.round(item.property_tax),
+                    Math.round(item.maintenance),
+                    Math.round(item.vve),
+                    Math.round(item.buyer_net_worth),
+                    Math.round(item.advantage)
+                ];
+                csvRows.push(row.join(','));
+            });
+
+            // Create CSV content
+            const csvContent = csvRows.join('\n');
+            
+            // Create and trigger download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'rent_vs_buy_yearly_breakdown.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function calculateResults() {
@@ -479,6 +553,9 @@
             updateChart(labels, buyerNetWorthTimeline, renterNetWorthTimeline);
             updateDeltaChart(labels, deltaNetWorthTimeline);
             populateYearlyTable(yearlyData);
+            
+            // Store yearly data for CSV export
+            currentYearlyData = yearlyData;
         }
 
         function populateYearlyTable(data) {
@@ -642,6 +719,7 @@
         // --- Event Listeners & Initial Load ---
         toggleDetailsButton.addEventListener('click', () => { const isHidden = detailsSection.classList.toggle('hidden'); detailsArrow.textContent = isHidden ? '▼' : '▲'; });
         toggleYearlyDataButton.addEventListener('click', () => { const isHidden = yearlyDataSection.classList.toggle('hidden'); yearlyDataArrow.textContent = isHidden ? '▼' : '▲'; });
+        exportCsvButton.addEventListener('click', exportToCsv);
         resetButton.addEventListener('click', resetToDefaults);
 
         window.onload = () => {
