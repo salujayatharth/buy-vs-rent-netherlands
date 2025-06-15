@@ -45,6 +45,10 @@
         .animate-color {
             transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
         }
+        /* Smooth table updates */
+        #yearlyDataTableBody {
+            transition: opacity 0.2s ease-in-out;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -189,14 +193,15 @@
         }
 
         function animateTextWithColor(element, targetText, targetClass, duration = 300) {
-            // Fade out current text
-            element.style.opacity = '0.5';
+            // Smooth transition for text and color changes
+            element.style.transition = 'opacity 0.15s ease-in-out';
+            element.style.opacity = '0.6';
             
             setTimeout(() => {
                 element.textContent = targetText;
                 element.className = targetClass + ' animate-value animate-color';
                 element.style.opacity = '1';
-            }, duration / 2);
+            }, 150);
         }
 
         // --- DOM Elements ---
@@ -272,7 +277,7 @@
             }
             animationTimeout = setTimeout(() => {
                 calculateResults();
-            }, 50); // Small delay to prevent too many rapid calculations
+            }, 30); // Reduced delay for more responsive feel while still preventing excessive calculations
         }
 
         function getInputs() {
@@ -413,14 +418,22 @@
         }
 
         function populateYearlyTable(data) {
-            yearlyDataTableBody.innerHTML = '';
-            data.forEach(item => {
-                const row = document.createElement('tr');
-                const advantageClass = item.advantage >= 0 ? 'text-blue-600' : 'text-green-600';
-                row.className = 'bg-white border-b hover:bg-gray-50 text-right';
-                row.innerHTML = `<td class="py-2 px-4 font-medium text-gray-900 text-center">${item.year}</td><td class="py-2 px-3 border-l border-gray-300">${formatCurrency(item.house_rent_pm)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_rent)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_invested)}</td><td class="py-2 px-3">${formatCurrency(item.investment_growth)}</td><td class="py-2 px-3 font-semibold">${formatCurrency(item.renter_net_worth)}</td><td class="py-2 px-3 border-l border-gray-300">${formatCurrency(item.house_value)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_costs_p_i)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_interest)}</td><td class="py-2 px-3 text-green-600">${formatCurrency(item.tax_deduction)}</td><td class="py-2 px-3">${formatCurrency(item.net_interest_cost)}</td><td class="py-2 px-3">${formatCurrency(item.property_tax)}</td><td class="py-2 px-3">${formatCurrency(item.maintenance)}</td><td class="py-2 px-3">${formatCurrency(item.vve)}</td><td class="py-2 px-3 font-semibold">${formatCurrency(item.buyer_net_worth)}</td><td class="py-2 px-4 font-semibold border-l border-gray-300 ${advantageClass}">${formatCurrency(item.advantage)}</td>`;
-                yearlyDataTableBody.appendChild(row);
-            });
+            // Add fade effect during table update
+            yearlyDataTableBody.style.opacity = '0.7';
+            
+            setTimeout(() => {
+                yearlyDataTableBody.innerHTML = '';
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    const advantageClass = item.advantage >= 0 ? 'text-blue-600' : 'text-green-600';
+                    row.className = 'bg-white border-b hover:bg-gray-50 text-right';
+                    row.innerHTML = `<td class="py-2 px-4 font-medium text-gray-900 text-center">${item.year}</td><td class="py-2 px-3 border-l border-gray-300">${formatCurrency(item.house_rent_pm)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_rent)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_invested)}</td><td class="py-2 px-3">${formatCurrency(item.investment_growth)}</td><td class="py-2 px-3 font-semibold">${formatCurrency(item.renter_net_worth)}</td><td class="py-2 px-3 border-l border-gray-300">${formatCurrency(item.house_value)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_costs_p_i)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_interest)}</td><td class="py-2 px-3 text-green-600">${formatCurrency(item.tax_deduction)}</td><td class="py-2 px-3">${formatCurrency(item.net_interest_cost)}</td><td class="py-2 px-3">${formatCurrency(item.property_tax)}</td><td class="py-2 px-3">${formatCurrency(item.maintenance)}</td><td class="py-2 px-3">${formatCurrency(item.vve)}</td><td class="py-2 px-3 font-semibold">${formatCurrency(item.buyer_net_worth)}</td><td class="py-2 px-4 font-semibold border-l border-gray-300 ${advantageClass}">${formatCurrency(item.advantage)}</td>`;
+                    yearlyDataTableBody.appendChild(row);
+                });
+                
+                // Fade back in
+                yearlyDataTableBody.style.opacity = '1';
+            }, 100);
         }
         
         function updateChart(labels, buyData, rentData) {
