@@ -560,8 +560,20 @@
                                 text: 'Projected Net Worth Over Time'
                             }, 
                             tooltip: { 
+                                mode: 'index',
+                                intersect: false,
                                 callbacks: { 
-                                    label: (context) => (context.dataset.label || '') + ': ' + formatCurrency(context.parsed.y)
+                                    title: (context) => `Year ${context[0].label}`,
+                                    label: (context) => (context.dataset.label || '') + ': ' + formatCurrency(context.parsed.y),
+                                    afterBody: (context) => {
+                                        if (context.length >= 2) {
+                                            const buyingValue = context.find(item => item.dataset.label.includes('Buying'))?.parsed.y || 0;
+                                            const rentingValue = context.find(item => item.dataset.label.includes('Renting'))?.parsed.y || 0;
+                                            const delta = rentingValue - buyingValue;
+                                            return `\nDelta (Rent - Buy): ${formatCurrency(delta)}`;
+                                        }
+                                        return '';
+                                    }
                                 }
                             }
                         } 
@@ -611,7 +623,12 @@
                             }, 
                             tooltip: { 
                                 callbacks: { 
-                                    label: (context) => 'Advantage: ' + formatCurrency(context.parsed.y) 
+                                    title: (context) => `Year ${context[0].label}`,
+                                    label: (context) => {
+                                        const value = context.parsed.y;
+                                        const interpretation = value >= 0 ? '(Renting is better)' : '(Buying is better)';
+                                        return `Net Worth Advantage: ${formatCurrency(value)} ${interpretation}`;
+                                    }
                                 } 
                             } 
                         }, 
