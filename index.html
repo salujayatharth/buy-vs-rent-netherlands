@@ -34,8 +34,10 @@
         }
         .details-section.hidden { display: none; }
         .table-container { max-height: 500px; overflow-y: auto; }
-        .table-container thead tr:first-child th { position: sticky; top: 0; z-index: 10; }
-        .table-container thead tr:nth-child(2) th { position: sticky; top: 2.5rem; z-index: 10; }
+        .table-container thead tr:first-child th { position: sticky; top: 0; z-index: 10; background-color: rgb(229 231 235); }
+        .table-container thead tr:first-child th.bg-blue-100 { background-color: rgb(219 234 254); }
+        .table-container thead tr:first-child th.bg-green-100 { background-color: rgb(220 252 231); }
+        .table-container thead tr:nth-child(2) th { position: sticky; top: 2.5rem; z-index: 10; background-color: rgb(243 244 246); }
         .sidebar {
              max-height: calc(100vh - 4rem); /* Adjust based on your header/footer height */
         }
