@@ -80,6 +80,29 @@ This is a web-based financial calculator to help users in the Netherlands decide
 - Ensure responsive behavior on mobile devices
 - Test edge cases (zero down payment, high appreciation rates)
 
+## Screenshot Workflow
+The repository includes automated screenshot functionality to capture the web application's state after completing tasks.
+
+### Taking Screenshots
+- Use the `take_screenshot.sh` script to capture screenshots of the application
+- Script automatically starts a local HTTP server, takes a screenshot using Chrome headless mode, and cleans up
+- Screenshots are saved in the `screenshots/` directory with timestamps
+- **When to use**: Take screenshots when completing meaningful tasks or changes to visually document the application state
+
+### Screenshot Script Features
+- Automatically serves the static HTML application locally
+- Uses Google Chrome in headless mode for consistent rendering
+- Captures full-page screenshots at 1920x1080 resolution
+- Includes error handling and cleanup processes
+- Provides colored output for better user experience
+
+### Usage Example
+```bash
+./take_screenshot.sh
+```
+
+This will create a timestamped screenshot file like `screenshots/nl-buy-vs-rent_YYYYMMDD_HHMMSS.png`
+
 ## Domain Expertise
 When working with this codebase, prioritize:
 1. **Financial Accuracy**: Ensure calculations reflect Dutch market reality
@@ -87,3 +110,4 @@ When working with this codebase, prioritize:
 3. **Performance**: Maintain smooth real-time calculations
 4. **Accessibility**: Support users with varying technical literacy
 5. **Localization**: Use Dutch financial terminology where appropriate
+6. **Documentation**: Take screenshots when completing tasks to visually document changes and application state
