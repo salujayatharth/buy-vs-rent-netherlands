@@ -81,76 +81,6 @@
                     <div class="bg-white p-4 rounded-lg shadow h-[280px] md:h-[300px]"><canvas id="netWorthChart"></canvas></div>
                     <div class="bg-white p-4 rounded-lg shadow h-[220px] md:h-[250px]"><canvas id="deltaChart"></canvas></div>
                 </div>
-                 <!-- Calculation Details & Table -->
-                <div class="bg-white p-6 rounded-xl shadow-xl mt-8">
-                    <button id="toggleDetailsButton" class="w-full text-left font-semibold text-indigo-600 p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition focus:outline-none">Show Key Totals Breakdown <span id="detailsArrow">▼</span></button>
-                    <div id="detailsSection" class="details-section hidden mt-4 p-6 bg-gray-50 border border-gray-200 rounded-lg">
-                        <!-- Details Content -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div>
-                                <h3 class="text-xl font-semibold text-green-700 mb-4 border-b pb-2">Buying Breakdown</h3>
-                                <div class="space-y-2 text-sm">
-                                    <p class="flex justify-between"><span>Initial Upfront Costs:</span><strong class="animate-value" id="detailUpfrontCosts">€0</strong></p>
-                                    <p class="flex justify-between"><span>Initial Loan Amount:</span><strong class="animate-value" id="detailLoanAmount">€0</strong></p>
-                                    <p class="flex justify-between"><span>Monthly Mortgage (P&I):</span><strong class="animate-value" id="detailMonthlyMortgage">€0</strong></p>
-                                    <hr class="my-2 border-gray-300">
-                                    <h4 class="font-semibold text-gray-600 pt-1">Total Costs Over Period</h4>
-                                    <p class="flex justify-between pl-2"><span>Mortgage Interest Paid:</span><strong class="animate-value" id="detailTotalInterest">€0</strong></p>
-                                    <p class="flex justify-between pl-2 text-green-600"><span>Tax Deduction Benefit:</span><strong class="animate-value" id="detailTotalDeduction">€0</strong></p>
-                                    <p class="flex justify-between pl-2"><span>Property Tax (OZB):</span><strong class="animate-value" id="detailTotalOzb">€0</strong></p>
-                                    <p class="flex justify-between pl-2"><span>Maintenance:</span><strong class="animate-value" id="detailTotalMaintenance">€0</strong></p>
-                                    <p class="flex justify-between pl-2"><span>VvE Fees:</span><strong class="animate-value" id="detailTotalVve">€0</strong></p>
-                                    <hr class="my-2 border-gray-300">
-                                    <h4 class="font-semibold text-gray-600 pt-1">Final Outcome</h4>
-                                    <p class="flex justify-between"><span>Final Home Value:</span><strong class="animate-value" id="detailFinalHomeValue">€0</strong></p>
-                                    <p class="flex justify-between"><span>Final Loan Balance:</span><strong class="animate-value" id="detailFinalLoanBalance">€0</strong></p>
-                                    <p class="flex justify-between font-bold text-base pt-1"><span>Final Equity (Net Worth):</span><strong class="animate-value" id="detailFinalEquity">€0</strong></p>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-semibold text-blue-700 mb-4 border-b pb-2">Renting Breakdown</h3>
-                                <div class="space-y-2 text-sm">
-                                    <p class="flex justify-between"><span>Initial Investment:</span><strong class="animate-value" id="detailInitialInvestment">€0</strong></p>
-                                    <p class="flex justify-between"><span>Extra Cash Invested:</span><strong class="animate-value" id="detailTotalCashInvested">€0</strong></p>
-                                    <p class="flex justify-between"><span>Investment Growth:</span><strong class="animate-value" id="detailTotalGrowth">€0</strong></p>
-                                    <hr class="my-2 border-gray-300">
-                                    <h4 class="font-semibold text-gray-600 pt-1">Total Costs Over Period</h4>
-                                    <p class="flex justify-between pl-2"><span>Total Rent Paid:</span><strong class="animate-value" id="detailTotalRent">€0</strong></p>
-                                    <p class="flex justify-between pl-2"><span>Wealth Tax Paid (Box 3):</span><strong class="animate-value" id="detailTotalWealthTax">€0</strong></p>
-                                    <hr class="my-2 border-gray-300">
-                                    <h4 class="font-semibold text-gray-600 pt-1">Final Outcome</h4>
-                                    <p class="flex justify-between font-bold text-base pt-1"><span>Final Investments (Net Worth):</span><strong class="animate-value" id="detailFinalInvestments">€0</strong></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                     <button id="toggleYearlyDataButton" class="w-full text-left font-semibold text-indigo-600 p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition focus:outline-none mt-4">Show Yearly Data Breakdown <span id="yearlyDataArrow">▼</span></button>
-                    <div id="yearlyDataSection" class="details-section hidden mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                        <!-- Yearly Data Table -->
-                        <div class="table-container">
-                            <table class="w-full text-sm text-left text-gray-600 whitespace-nowrap">
-                                <thead class="text-xs text-gray-700 uppercase bg-gray-200">
-                                    <tr>
-                                        <th rowspan="2" class="py-3 px-4 align-bottom">Year</th>
-                                        <th colspan="5" class="py-2 px-4 text-center border-b border-l border-gray-300 bg-blue-100">Renter Details</th>
-                                        <th colspan="9" class="py-2 px-4 text-center border-b border-l border-gray-300 bg-green-100">Buyer Details</th>
-                                        <th rowspan="2" class="py-3 px-4 align-bottom border-l border-gray-300"><span class="tooltip">Advantage<span class="tooltiptext w-72">Compares the final net worth of both scenarios.<br><br><strong>Formula:</strong><br>Renter Net Worth - Buyer Net Worth<br><br>A positive value means renting is financially better. A negative value means buying is better.</span></span></th>
-                                    </tr>
-                                    <tr class="bg-gray-100">
-                                        <th class="py-2 px-3 border-l border-gray-300">Monthly Rent</th><th class="py-2 px-3">Yearly Rent</th><th class="py-2 px-3">Yearly Invested</th><th class="py-2 px-3">Growth</th><th class="py-2 px-3">Net Worth</th>
-                                        <th class="py-2 px-3 border-l border-gray-300">House Value</th><th class="py-2 px-3">EMI (P&I)</th><th class="py-2 px-3">Interest</th><th class="py-2 px-3">Deduction</th><th class="py-2 px-3">Net Interest</th><th class="py-2 px-3">Property Tax</th><th class="py-2 px-3">Maintenance</th><th class="py-2 px-3">VvE</th><th class="py-2 px-3">Net Worth</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="yearlyDataTableBody"></tbody>
-                            </table>
-                        </div>
-                        <div class="mt-4 text-center">
-                            <button id="exportCsvButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                                Export as CSV
-                            </button>
-                        </div>
-                    </div>
-                </div>
 
             </main>
 
@@ -165,6 +95,77 @@
                     <div class="p-4 border border-gray-200 rounded-lg"><h3 class="text-lg font-semibold mb-3 text-blue-700 border-b pb-2">▼ Rent Scenario</h3><div class="space-y-4"><div id="monthlyRent-container"></div><div id="annualRentIncrease-container"></div><div id="investmentReturnRate-container"></div><fieldset class="mt-2"><legend class="form-label tooltip">Investment Tax (Box 3)<span class="tooltiptext">Tax on net assets (savings/investments) above a threshold (heffingsvrij vermogen, approx €57k/person). Simplified here.</span></legend><div class="flex items-center space-x-4 text-sm"><label><input type="radio" name="investmentTax" value="taxFree" class="mr-1"> Tax-Free</label><label><input type="radio" name="investmentTax" value="taxable" checked class="mr-1"> Taxable</label></div></fieldset></div></div>
                 </div>
             </aside>
+        </div>
+
+        <!-- Calculation Details & Table - Full Width Section -->
+        <div class="bg-white p-6 rounded-xl shadow-xl mt-8">
+            <button id="toggleDetailsButton" class="w-full text-left font-semibold text-indigo-600 p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition focus:outline-none">Show Key Totals Breakdown <span id="detailsArrow">▼</span></button>
+            <div id="detailsSection" class="details-section hidden mt-4 p-6 bg-gray-50 border border-gray-200 rounded-lg">
+                <!-- Details Content -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold text-green-700 mb-4 border-b pb-2">Buying Breakdown</h3>
+                        <div class="space-y-2 text-sm">
+                            <p class="flex justify-between"><span>Initial Upfront Costs:</span><strong class="animate-value" id="detailUpfrontCosts">€0</strong></p>
+                            <p class="flex justify-between"><span>Initial Loan Amount:</span><strong class="animate-value" id="detailLoanAmount">€0</strong></p>
+                            <p class="flex justify-between"><span>Monthly Mortgage (P&I):</span><strong class="animate-value" id="detailMonthlyMortgage">€0</strong></p>
+                            <hr class="my-2 border-gray-300">
+                            <h4 class="font-semibold text-gray-600 pt-1">Total Costs Over Period</h4>
+                            <p class="flex justify-between pl-2"><span>Mortgage Interest Paid:</span><strong class="animate-value" id="detailTotalInterest">€0</strong></p>
+                            <p class="flex justify-between pl-2 text-green-600"><span>Tax Deduction Benefit:</span><strong class="animate-value" id="detailTotalDeduction">€0</strong></p>
+                            <p class="flex justify-between pl-2"><span>Property Tax (OZB):</span><strong class="animate-value" id="detailTotalOzb">€0</strong></p>
+                            <p class="flex justify-between pl-2"><span>Maintenance:</span><strong class="animate-value" id="detailTotalMaintenance">€0</strong></p>
+                            <p class="flex justify-between pl-2"><span>VvE Fees:</span><strong class="animate-value" id="detailTotalVve">€0</strong></p>
+                            <hr class="my-2 border-gray-300">
+                            <h4 class="font-semibold text-gray-600 pt-1">Final Outcome</h4>
+                            <p class="flex justify-between"><span>Final Home Value:</span><strong class="animate-value" id="detailFinalHomeValue">€0</strong></p>
+                            <p class="flex justify-between"><span>Final Loan Balance:</span><strong class="animate-value" id="detailFinalLoanBalance">€0</strong></p>
+                            <p class="flex justify-between font-bold text-base pt-1"><span>Final Equity (Net Worth):</span><strong class="animate-value" id="detailFinalEquity">€0</strong></p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-blue-700 mb-4 border-b pb-2">Renting Breakdown</h3>
+                        <div class="space-y-2 text-sm">
+                            <p class="flex justify-between"><span>Initial Investment:</span><strong class="animate-value" id="detailInitialInvestment">€0</strong></p>
+                            <p class="flex justify-between"><span>Extra Cash Invested:</span><strong class="animate-value" id="detailTotalCashInvested">€0</strong></p>
+                            <p class="flex justify-between"><span>Investment Growth:</span><strong class="animate-value" id="detailTotalGrowth">€0</strong></p>
+                            <hr class="my-2 border-gray-300">
+                            <h4 class="font-semibold text-gray-600 pt-1">Total Costs Over Period</h4>
+                            <p class="flex justify-between pl-2"><span>Total Rent Paid:</span><strong class="animate-value" id="detailTotalRent">€0</strong></p>
+                            <p class="flex justify-between pl-2"><span>Wealth Tax Paid (Box 3):</span><strong class="animate-value" id="detailTotalWealthTax">€0</strong></p>
+                            <hr class="my-2 border-gray-300">
+                            <h4 class="font-semibold text-gray-600 pt-1">Final Outcome</h4>
+                            <p class="flex justify-between font-bold text-base pt-1"><span>Final Investments (Net Worth):</span><strong class="animate-value" id="detailFinalInvestments">€0</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="toggleYearlyDataButton" class="w-full text-left font-semibold text-indigo-600 p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition focus:outline-none mt-4">Show Yearly Data Breakdown <span id="yearlyDataArrow">▼</span></button>
+            <div id="yearlyDataSection" class="details-section hidden mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                <!-- Yearly Data Table -->
+                <div class="table-container">
+                    <table class="w-full text-sm text-left text-gray-600 whitespace-nowrap">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                            <tr>
+                                <th rowspan="2" class="py-3 px-4 align-bottom">Year</th>
+                                <th colspan="5" class="py-2 px-4 text-center border-b border-l border-gray-300 bg-blue-100">Renter Details</th>
+                                <th colspan="9" class="py-2 px-4 text-center border-b border-l border-gray-300 bg-green-100">Buyer Details</th>
+                                <th rowspan="2" class="py-3 px-4 align-bottom border-l border-gray-300"><span class="tooltip">Advantage<span class="tooltiptext w-72">Compares the final net worth of both scenarios.<br><br><strong>Formula:</strong><br>Renter Net Worth - Buyer Net Worth<br><br>A positive value means renting is financially better. A negative value means buying is better.</span></span></th>
+                            </tr>
+                            <tr class="bg-gray-100">
+                                <th class="py-2 px-3 border-l border-gray-300">Monthly Rent</th><th class="py-2 px-3">Yearly Rent</th><th class="py-2 px-3">Yearly Invested</th><th class="py-2 px-3">Growth</th><th class="py-2 px-3">Net Worth</th>
+                                <th class="py-2 px-3 border-l border-gray-300">House Value</th><th class="py-2 px-3">EMI (P&I)</th><th class="py-2 px-3">Interest</th><th class="py-2 px-3">Deduction</th><th class="py-2 px-3">Net Interest</th><th class="py-2 px-3">Property Tax</th><th class="py-2 px-3">Maintenance</th><th class="py-2 px-3">VvE</th><th class="py-2 px-3">Net Worth</th>
+                            </tr>
+                        </thead>
+                        <tbody id="yearlyDataTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="mt-4 text-center">
+                    <button id="exportCsvButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        Export as CSV
+                    </button>
+                </div>
+            </div>
         </div>
 
         <footer class="text-center mt-12 py-4 border-t border-gray-200">
