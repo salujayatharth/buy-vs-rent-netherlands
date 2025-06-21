@@ -5,29 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rent vs. Buy Calculator - Netherlands</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .form-input {
-            @apply w-20 p-1 border border-gray-300 rounded-md shadow-sm text-sm text-right;
+            @apply w-20 p-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm text-right bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100;
         }
         .form-label {
-            @apply block text-sm font-medium text-gray-700 mb-1;
+            @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
         }
         .slider {
-            @apply w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer;
+            @apply w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer;
         }
         .slider::-webkit-slider-thumb {
-            @apply w-4 h-4 bg-indigo-600 rounded-full appearance-none cursor-pointer;
+            @apply w-4 h-4 bg-indigo-600 dark:bg-indigo-500 rounded-full appearance-none cursor-pointer;
         }
         .slider::-moz-range-thumb {
-            @apply w-4 h-4 bg-indigo-600 rounded-full border-0 cursor-pointer;
+            @apply w-4 h-4 bg-indigo-600 dark:bg-indigo-500 rounded-full border-0 cursor-pointer;
         }
         .tooltip {
             @apply relative inline-block cursor-help;
         }
         .tooltip .tooltiptext {
-            @apply invisible w-64 bg-gray-800 text-white text-left text-xs rounded-md py-2 px-3 absolute z-10 bottom-full left-1/2 -ml-32 opacity-0 transition-opacity duration-300 shadow-lg;
+            @apply invisible w-64 bg-gray-800 dark:bg-gray-700 text-white dark:text-gray-200 text-left text-xs rounded-md py-2 px-3 absolute z-10 bottom-full left-1/2 -ml-32 opacity-0 transition-opacity duration-300 shadow-lg;
         }
         .tooltip:hover .tooltiptext {
             @apply visible opacity-100;
@@ -52,18 +57,90 @@
         #yearlyDataTableBody {
             transition: opacity 0.2s ease-in-out;
         }
+        /* Dark mode specific overrides */
+        .dark .table-container thead tr:first-child th { 
+            background-color: rgb(55 65 81); 
+        }
+        .dark .table-container thead tr:first-child th.bg-blue-100 { 
+            background-color: rgb(30 58 138); 
+        }
+        .dark .table-container thead tr:first-child th.bg-green-100 { 
+            background-color: rgb(21 128 61); 
+        }
+        .dark .table-container thead tr:nth-child(2) th { 
+            background-color: rgb(75 85 99); 
+        }
+        /* Theme toggle switch */
+        .theme-toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        .theme-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .theme-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: .4s;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .theme-slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 3px;
+            bottom: 3px;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        input:checked + .theme-slider {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+        input:checked + .theme-slider:before {
+            transform: translateX(30px);
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        }
+        .theme-slider.round {
+            border-radius: 30px;
+        }
+        .theme-slider.round:before {
+            border-radius: 50%;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300">
     <div class="container mx-auto p-4 md:p-8">
         <header class="flex justify-between items-center mb-6">
             <div class="text-center flex-1">
-                <h1 class="text-3xl md:text-4xl font-bold text-indigo-600">Interactive Rent vs. Buy Calculator</h1>
-                <p class="text-lg text-gray-600">Netherlands Edition</p>
+                <h1 class="text-3xl md:text-4xl font-bold text-indigo-600 dark:text-indigo-400">Interactive Rent vs. Buy Calculator</h1>
+                <p class="text-lg text-gray-600 dark:text-gray-300">Netherlands Edition</p>
             </div>
-            <button id="resetButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                Reset to Defaults
-            </button>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3">
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">🌞</span>
+                    <label class="theme-toggle">
+                        <input type="checkbox" id="themeToggle">
+                        <span class="theme-slider round"></span>
+                    </label>
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">🌙</span>
+                </div>
+                <button id="resetButton" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                    Reset to Defaults
+                </button>
+            </div>
         </header>
 
         <div class="flex flex-col lg:flex-row gap-6">
@@ -71,125 +148,125 @@
             <main class="lg:w-3/4 w-full">
                 <!-- Results Summary -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div class="bg-blue-50 p-6 rounded-lg shadow">
-                        <h3 class="text-xl font-semibold text-blue-700 mb-2">Renting Scenario</h3>
-                        <p class="text-2xl font-bold text-blue-800 animate-value" id="rentMonthlyPayment">€0</p>
-                        <p class="text-xs text-gray-600 mb-3">Monthly Payment (Year 1)</p>
-                        <p class="text-3xl font-bold text-blue-600 animate-value" id="rentFinalNW">€0</p>
-                        <p class="text-sm text-gray-500">Projected Net Worth</p>
+                    <div class="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-lg shadow-lg dark:shadow-xl border border-blue-100 dark:border-blue-800">
+                        <h3 class="text-xl font-semibold text-blue-700 dark:text-blue-300 mb-2">Renting Scenario</h3>
+                        <p class="text-2xl font-bold text-blue-800 dark:text-blue-200 animate-value" id="rentMonthlyPayment">€0</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">Monthly Payment (Year 1)</p>
+                        <p class="text-3xl font-bold text-blue-600 dark:text-blue-300 animate-value" id="rentFinalNW">€0</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Projected Net Worth</p>
                     </div>
-                    <div class="bg-green-50 p-6 rounded-lg shadow">
-                        <h3 class="text-xl font-semibold text-green-700 mb-2">Buying Scenario</h3>
-                        <p class="text-2xl font-bold text-green-800 animate-value" id="buyMonthlyPayment">€0</p>
-                        <p class="text-xs text-gray-600 mb-3">Monthly Payment (Year 1)</p>
-                        <p class="text-3xl font-bold text-green-600 animate-value" id="buyFinalNW">€0</p>
-                        <p class="text-sm text-gray-500">Projected Net Worth (Equity)</p>
+                    <div class="bg-green-50 dark:bg-green-900/30 p-6 rounded-lg shadow-lg dark:shadow-xl border border-green-100 dark:border-green-800">
+                        <h3 class="text-xl font-semibold text-green-700 dark:text-green-300 mb-2">Buying Scenario</h3>
+                        <p class="text-2xl font-bold text-green-800 dark:text-green-200 animate-value" id="buyMonthlyPayment">€0</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">Monthly Payment (Year 1)</p>
+                        <p class="text-3xl font-bold text-green-600 dark:text-green-300 animate-value" id="buyFinalNW">€0</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Projected Net Worth (Equity)</p>
                     </div>
                 </div>
-                <div class="text-center mb-6 p-4 bg-indigo-50 rounded-lg shadow">
-                    <h3 class="text-xl font-semibold text-indigo-700">Advantage After Time Horizon</h3>
-                    <p class="text-3xl font-bold text-indigo-600 animate-value animate-color" id="rentingAdvantageValue">€0</p>
+                <div class="text-center mb-6 p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg shadow-lg dark:shadow-xl border border-indigo-100 dark:border-indigo-800">
+                    <h3 class="text-xl font-semibold text-indigo-700 dark:text-indigo-300">Advantage After Time Horizon</h3>
+                    <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-300 animate-value animate-color" id="rentingAdvantageValue">€0</p>
                 </div>
 
                 <!-- Charts -->
                 <div class="space-y-6">
-                    <div class="bg-white p-4 rounded-lg shadow h-[280px] md:h-[300px]"><canvas id="netWorthChart"></canvas></div>
-                    <div class="bg-white p-4 rounded-lg shadow h-[220px] md:h-[250px]"><canvas id="deltaChart"></canvas></div>
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg dark:shadow-xl h-[280px] md:h-[300px]"><canvas id="netWorthChart"></canvas></div>
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg dark:shadow-xl h-[220px] md:h-[250px]"><canvas id="deltaChart"></canvas></div>
                 </div>
 
             </main>
 
             <!-- Sidebar with Inputs -->
-            <aside class="lg:w-1/4 w-full bg-white p-5 rounded-xl shadow-xl sidebar overflow-y-auto">
+            <aside class="lg:w-1/4 w-full bg-white dark:bg-gray-800 p-5 rounded-xl shadow-xl dark:shadow-2xl sidebar overflow-y-auto border border-gray-100 dark:border-gray-700">
                 <div class="space-y-5">
                     <!-- Common Assumptions -->
-                    <div class="p-4 border border-gray-200 rounded-lg"><h3 class="text-lg font-semibold mb-3 text-gray-700 border-b pb-2">Common Assumptions</h3><div id="timeHorizon-container"></div></div>
+                    <div class="p-4 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 rounded-lg"><h3 class="text-lg font-semibold mb-3 text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600 pb-2">Common Assumptions</h3><div id="timeHorizon-container"></div></div>
                     <!-- Buy Scenario -->
-                    <div class="p-4 border border-gray-200 rounded-lg"><h3 class="text-lg font-semibold mb-3 text-green-700 border-b pb-2">▼ Buy Scenario</h3><div class="space-y-4"><div id="purchasePrice-container"></div><div id="downPayment-container"></div><div id="mortgageInterestRate-container"></div><div id="amortization-container"></div><div id="propertyTaxRate-container"></div><div id="maintenanceCosts-container"></div><div id="vveRate-container"></div><fieldset class="text-sm text-gray-600"><legend class="form-label -mb-1">Costs Based On:</legend><label class="mr-3"><input type="radio" name="maintenanceBasis" value="original" class="mr-1">Original Price</label><label><input type="radio" name="maintenanceBasis" value="current" checked class="mr-1">Current Value</label></fieldset><div id="propertyAppreciationRate-container"></div><div id="otherBuyerCostsRate-container"></div><div id="effectiveMarginalTaxRate-container"></div></div></div>
+                    <div class="p-4 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 rounded-lg"><h3 class="text-lg font-semibold mb-3 text-green-700 dark:text-green-400 border-b border-gray-200 dark:border-gray-600 pb-2">▼ Buy Scenario</h3><div class="space-y-4"><div id="purchasePrice-container"></div><div id="downPayment-container"></div><div id="mortgageInterestRate-container"></div><div id="amortization-container"></div><div id="propertyTaxRate-container"></div><div id="maintenanceCosts-container"></div><div id="vveRate-container"></div><fieldset class="text-sm text-gray-600 dark:text-gray-300"><legend class="form-label -mb-1">Costs Based On:</legend><label class="mr-3"><input type="radio" name="maintenanceBasis" value="original" class="mr-1">Original Price</label><label><input type="radio" name="maintenanceBasis" value="current" checked class="mr-1">Current Value</label></fieldset><div id="propertyAppreciationRate-container"></div><div id="otherBuyerCostsRate-container"></div><div id="effectiveMarginalTaxRate-container"></div></div></div>
                     <!-- Rent Scenario -->
-                    <div class="p-4 border border-gray-200 rounded-lg"><h3 class="text-lg font-semibold mb-3 text-blue-700 border-b pb-2">▼ Rent Scenario</h3><div class="space-y-4"><div id="monthlyRent-container"></div><div id="annualRentIncrease-container"></div><div id="investmentReturnRate-container"></div><fieldset class="mt-2"><legend class="form-label tooltip">Investment Tax (Box 3)<span class="tooltiptext">Tax on net assets (savings/investments) above a threshold (heffingsvrij vermogen, approx €57k/person). Simplified here.</span></legend><div class="flex items-center space-x-4 text-sm"><label><input type="radio" name="investmentTax" value="taxFree" class="mr-1"> Tax-Free</label><label><input type="radio" name="investmentTax" value="taxable" checked class="mr-1"> Taxable</label></div></fieldset></div></div>
+                    <div class="p-4 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 rounded-lg"><h3 class="text-lg font-semibold mb-3 text-blue-700 dark:text-blue-400 border-b border-gray-200 dark:border-gray-600 pb-2">▼ Rent Scenario</h3><div class="space-y-4"><div id="monthlyRent-container"></div><div id="annualRentIncrease-container"></div><div id="investmentReturnRate-container"></div><fieldset class="mt-2"><legend class="form-label tooltip">Investment Tax (Box 3)<span class="tooltiptext">Tax on net assets (savings/investments) above a threshold (heffingsvrij vermogen, approx €57k/person). Simplified here.</span></legend><div class="flex items-center space-x-4 text-sm"><label class="text-gray-600 dark:text-gray-300"><input type="radio" name="investmentTax" value="taxFree" class="mr-1"> Tax-Free</label><label class="text-gray-600 dark:text-gray-300"><input type="radio" name="investmentTax" value="taxable" checked class="mr-1"> Taxable</label></div></fieldset></div></div>
                 </div>
             </aside>
         </div>
 
         <!-- Calculation Details & Table - Full Width Section -->
-        <div class="bg-white p-6 rounded-xl shadow-xl mt-8">
-            <button id="toggleDetailsButton" class="w-full text-left font-semibold text-indigo-600 p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition focus:outline-none">Show Key Totals Breakdown <span id="detailsArrow">▼</span></button>
-            <div id="detailsSection" class="details-section hidden mt-4 p-6 bg-gray-50 border border-gray-200 rounded-lg">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl dark:shadow-2xl mt-8 border border-gray-100 dark:border-gray-700">
+            <button id="toggleDetailsButton" class="w-full text-left font-semibold text-indigo-600 dark:text-indigo-400 p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition focus:outline-none border border-indigo-100 dark:border-indigo-800">Show Key Totals Breakdown <span id="detailsArrow">▼</span></button>
+            <div id="detailsSection" class="details-section hidden mt-4 p-6 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg">
                 <!-- Details Content -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <h3 class="text-xl font-semibold text-green-700 mb-4 border-b pb-2">Buying Breakdown</h3>
+                        <h3 class="text-xl font-semibold text-green-700 dark:text-green-400 mb-4 border-b border-green-200 dark:border-green-700 pb-2">Buying Breakdown</h3>
                         <div class="space-y-2 text-sm">
-                            <p class="flex justify-between"><span>Initial Upfront Costs:</span><strong class="animate-value" id="detailUpfrontCosts">€0</strong></p>
-                            <p class="flex justify-between"><span>Initial Loan Amount:</span><strong class="animate-value" id="detailLoanAmount">€0</strong></p>
-                            <p class="flex justify-between"><span>Monthly Mortgage (P&I):</span><strong class="animate-value" id="detailMonthlyMortgage">€0</strong></p>
-                            <hr class="my-2 border-gray-300">
-                            <h4 class="font-semibold text-gray-600 pt-1">Total Costs Over Period</h4>
-                            <p class="flex justify-between pl-2"><span>Mortgage Interest Paid:</span><strong class="animate-value" id="detailTotalInterest">€0</strong></p>
-                            <p class="flex justify-between pl-2 text-green-600"><span>Tax Deduction Benefit:</span><strong class="animate-value" id="detailTotalDeduction">€0</strong></p>
-                            <p class="flex justify-between pl-2"><span>Property Tax (OZB):</span><strong class="animate-value" id="detailTotalOzb">€0</strong></p>
-                            <p class="flex justify-between pl-2"><span>Maintenance:</span><strong class="animate-value" id="detailTotalMaintenance">€0</strong></p>
-                            <p class="flex justify-between pl-2"><span>VvE Fees:</span><strong class="animate-value" id="detailTotalVve">€0</strong></p>
-                            <hr class="my-2 border-gray-300">
-                            <h4 class="font-semibold text-gray-600 pt-1">Final Outcome</h4>
-                            <p class="flex justify-between"><span>Final Home Value:</span><strong class="animate-value" id="detailFinalHomeValue">€0</strong></p>
-                            <p class="flex justify-between"><span>Final Loan Balance:</span><strong class="animate-value" id="detailFinalLoanBalance">€0</strong></p>
-                            <p class="flex justify-between font-bold text-base pt-1"><span>Final Equity (Net Worth):</span><strong class="animate-value" id="detailFinalEquity">€0</strong></p>
+                            <p class="flex justify-between text-gray-700 dark:text-gray-300"><span>Initial Upfront Costs:</span><strong class="animate-value" id="detailUpfrontCosts">€0</strong></p>
+                            <p class="flex justify-between text-gray-700 dark:text-gray-300"><span>Initial Loan Amount:</span><strong class="animate-value" id="detailLoanAmount">€0</strong></p>
+                            <p class="flex justify-between text-gray-700 dark:text-gray-300"><span>Monthly Mortgage (P&I):</span><strong class="animate-value" id="detailMonthlyMortgage">€0</strong></p>
+                            <hr class="my-2 border-gray-300 dark:border-gray-600">
+                            <h4 class="font-semibold text-gray-600 dark:text-gray-400 pt-1">Total Costs Over Period</h4>
+                            <p class="flex justify-between pl-2 text-gray-700 dark:text-gray-300"><span>Mortgage Interest Paid:</span><strong class="animate-value" id="detailTotalInterest">€0</strong></p>
+                            <p class="flex justify-between pl-2 text-green-600 dark:text-green-400"><span>Tax Deduction Benefit:</span><strong class="animate-value" id="detailTotalDeduction">€0</strong></p>
+                            <p class="flex justify-between pl-2 text-gray-700 dark:text-gray-300"><span>Property Tax (OZB):</span><strong class="animate-value" id="detailTotalOzb">€0</strong></p>
+                            <p class="flex justify-between pl-2 text-gray-700 dark:text-gray-300"><span>Maintenance:</span><strong class="animate-value" id="detailTotalMaintenance">€0</strong></p>
+                            <p class="flex justify-between pl-2 text-gray-700 dark:text-gray-300"><span>VvE Fees:</span><strong class="animate-value" id="detailTotalVve">€0</strong></p>
+                            <hr class="my-2 border-gray-300 dark:border-gray-600">
+                            <h4 class="font-semibold text-gray-600 dark:text-gray-400 pt-1">Final Outcome</h4>
+                            <p class="flex justify-between text-gray-700 dark:text-gray-300"><span>Final Home Value:</span><strong class="animate-value" id="detailFinalHomeValue">€0</strong></p>
+                            <p class="flex justify-between text-gray-700 dark:text-gray-300"><span>Final Loan Balance:</span><strong class="animate-value" id="detailFinalLoanBalance">€0</strong></p>
+                            <p class="flex justify-between font-bold text-base pt-1 text-gray-800 dark:text-gray-200"><span>Final Equity (Net Worth):</span><strong class="animate-value" id="detailFinalEquity">€0</strong></p>
                         </div>
                     </div>
                     <div>
-                        <h3 class="text-xl font-semibold text-blue-700 mb-4 border-b pb-2">Renting Breakdown</h3>
+                        <h3 class="text-xl font-semibold text-blue-700 dark:text-blue-400 mb-4 border-b border-blue-200 dark:border-blue-700 pb-2">Renting Breakdown</h3>
                         <div class="space-y-2 text-sm">
-                            <p class="flex justify-between"><span>Initial Investment:</span><strong class="animate-value" id="detailInitialInvestment">€0</strong></p>
-                            <p class="flex justify-between"><span>Extra Cash Invested:</span><strong class="animate-value" id="detailTotalCashInvested">€0</strong></p>
-                            <p class="flex justify-between"><span>Investment Growth:</span><strong class="animate-value" id="detailTotalGrowth">€0</strong></p>
-                            <hr class="my-2 border-gray-300">
-                            <h4 class="font-semibold text-gray-600 pt-1">Total Costs Over Period</h4>
-                            <p class="flex justify-between pl-2"><span>Total Rent Paid:</span><strong class="animate-value" id="detailTotalRent">€0</strong></p>
-                            <p class="flex justify-between pl-2"><span>Wealth Tax Paid (Box 3):</span><strong class="animate-value" id="detailTotalWealthTax">€0</strong></p>
-                            <hr class="my-2 border-gray-300">
-                            <h4 class="font-semibold text-gray-600 pt-1">Final Outcome</h4>
-                            <p class="flex justify-between font-bold text-base pt-1"><span>Final Investments (Net Worth):</span><strong class="animate-value" id="detailFinalInvestments">€0</strong></p>
+                            <p class="flex justify-between text-gray-700 dark:text-gray-300"><span>Initial Investment:</span><strong class="animate-value" id="detailInitialInvestment">€0</strong></p>
+                            <p class="flex justify-between text-gray-700 dark:text-gray-300"><span>Extra Cash Invested:</span><strong class="animate-value" id="detailTotalCashInvested">€0</strong></p>
+                            <p class="flex justify-between text-gray-700 dark:text-gray-300"><span>Investment Growth:</span><strong class="animate-value" id="detailTotalGrowth">€0</strong></p>
+                            <hr class="my-2 border-gray-300 dark:border-gray-600">
+                            <h4 class="font-semibold text-gray-600 dark:text-gray-400 pt-1">Total Costs Over Period</h4>
+                            <p class="flex justify-between pl-2 text-gray-700 dark:text-gray-300"><span>Total Rent Paid:</span><strong class="animate-value" id="detailTotalRent">€0</strong></p>
+                            <p class="flex justify-between pl-2 text-gray-700 dark:text-gray-300"><span>Wealth Tax Paid (Box 3):</span><strong class="animate-value" id="detailTotalWealthTax">€0</strong></p>
+                            <hr class="my-2 border-gray-300 dark:border-gray-600">
+                            <h4 class="font-semibold text-gray-600 dark:text-gray-400 pt-1">Final Outcome</h4>
+                            <p class="flex justify-between font-bold text-base pt-1 text-gray-800 dark:text-gray-200"><span>Final Investments (Net Worth):</span><strong class="animate-value" id="detailFinalInvestments">€0</strong></p>
                         </div>
                     </div>
                 </div>
             </div>
-            <button id="toggleYearlyDataButton" class="w-full text-left font-semibold text-indigo-600 p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition focus:outline-none mt-4">Show Yearly Data Breakdown <span id="yearlyDataArrow">▼</span></button>
-            <div id="yearlyDataSection" class="details-section hidden mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <button id="toggleYearlyDataButton" class="w-full text-left font-semibold text-indigo-600 dark:text-indigo-400 p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition focus:outline-none mt-4 border border-indigo-100 dark:border-indigo-800">Show Yearly Data Breakdown <span id="yearlyDataArrow">▼</span></button>
+            <div id="yearlyDataSection" class="details-section hidden mt-4 p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg">
                 <!-- Yearly Data Table -->
                 <div class="table-container">
-                    <table class="w-full text-sm text-left text-gray-600 whitespace-nowrap">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                    <table class="w-full text-sm text-left text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                        <thead class="text-xs text-gray-700 dark:text-gray-200 uppercase bg-gray-200 dark:bg-gray-700">
                             <tr>
                                 <th rowspan="2" class="py-3 px-4 align-bottom">Year</th>
-                                <th colspan="5" class="py-2 px-4 text-center border-b border-l border-gray-300 bg-blue-100">Renter Details</th>
-                                <th colspan="9" class="py-2 px-4 text-center border-b border-l border-gray-300 bg-green-100">Buyer Details</th>
-                                <th rowspan="2" class="py-3 px-4 align-bottom border-l border-gray-300"><span class="tooltip">Advantage<span class="tooltiptext w-72">Compares the final net worth of both scenarios.<br><br><strong>Formula:</strong><br>Renter Net Worth - Buyer Net Worth<br><br>A positive value means renting is financially better. A negative value means buying is better.</span></span></th>
+                                <th colspan="5" class="py-2 px-4 text-center border-b border-l border-gray-300 dark:border-gray-600 bg-blue-100 dark:bg-blue-900/50">Renter Details</th>
+                                <th colspan="9" class="py-2 px-4 text-center border-b border-l border-gray-300 dark:border-gray-600 bg-green-100 dark:bg-green-900/50">Buyer Details</th>
+                                <th rowspan="2" class="py-3 px-4 align-bottom border-l border-gray-300 dark:border-gray-600"><span class="tooltip">Advantage<span class="tooltiptext w-72">Compares the final net worth of both scenarios.<br><br><strong>Formula:</strong><br>Renter Net Worth - Buyer Net Worth<br><br>A positive value means renting is financially better. A negative value means buying is better.</span></span></th>
                             </tr>
-                            <tr class="bg-gray-100">
-                                <th class="py-2 px-3 border-l border-gray-300">Monthly Rent</th><th class="py-2 px-3">Yearly Rent</th><th class="py-2 px-3">Yearly Invested</th><th class="py-2 px-3">Growth</th><th class="py-2 px-3">Net Worth</th>
-                                <th class="py-2 px-3 border-l border-gray-300">House Value</th><th class="py-2 px-3">EMI (P&I)</th><th class="py-2 px-3">Interest</th><th class="py-2 px-3">Deduction</th><th class="py-2 px-3">Net Interest</th><th class="py-2 px-3">Property Tax</th><th class="py-2 px-3">Maintenance</th><th class="py-2 px-3">VvE</th><th class="py-2 px-3">Net Worth</th>
+                            <tr class="bg-gray-100 dark:bg-gray-800">
+                                <th class="py-2 px-3 border-l border-gray-300 dark:border-gray-600">Monthly Rent</th><th class="py-2 px-3">Yearly Rent</th><th class="py-2 px-3">Yearly Invested</th><th class="py-2 px-3">Growth</th><th class="py-2 px-3">Net Worth</th>
+                                <th class="py-2 px-3 border-l border-gray-300 dark:border-gray-600">House Value</th><th class="py-2 px-3">EMI (P&I)</th><th class="py-2 px-3">Interest</th><th class="py-2 px-3">Deduction</th><th class="py-2 px-3">Net Interest</th><th class="py-2 px-3">Property Tax</th><th class="py-2 px-3">Maintenance</th><th class="py-2 px-3">VvE</th><th class="py-2 px-3">Net Worth</th>
                             </tr>
                         </thead>
                         <tbody id="yearlyDataTableBody"></tbody>
                     </table>
                 </div>
                 <div class="mt-4 text-center">
-                    <button id="exportCsvButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    <button id="exportCsvButton" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
                         Export as CSV
                     </button>
                 </div>
             </div>
         </div>
 
-        <footer class="text-center mt-12 py-4 border-t border-gray-200">
-            <p class="text-sm text-gray-600 mb-2">
-                <a href="https://github.com/salujayatharth/nl-buy-vs-rent" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-800 transition-colors">
+        <footer class="text-center mt-12 py-4 border-t border-gray-200 dark:border-gray-700">
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                <a href="https://github.com/salujayatharth/nl-buy-vs-rent" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors">
                     View on GitHub
                 </a>
             </p>
-            <p class="text-sm text-gray-500">Disclaimer: This calculator is for illustrative purposes only and not financial advice.</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Disclaimer: This calculator is for illustrative purposes only and not financial advice.</p>
         </footer>
     </div>
 
@@ -200,6 +277,65 @@
         let netWorthChart, deltaChart;
         let animationTimeout = null;
         let currentYearlyData = []; // Store current yearly data for CSV export
+
+        // --- Theme Management ---
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = savedTheme === 'dark' || (!savedTheme && true); // Default to dark mode
+            
+            if (prefersDark) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('themeToggle').checked = true;
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('themeToggle').checked = false;
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            if (isDark) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                document.getElementById('themeToggle').checked = false;
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                document.getElementById('themeToggle').checked = true;
+            }
+            
+            // Update chart colors if charts exist
+            updateChartColors();
+        }
+
+        function updateChartColors() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#e5e7eb' : '#374151';
+            const gridColor = isDark ? '#374151' : '#e5e7eb';
+            
+            if (netWorthChart) {
+                netWorthChart.options.scales.x.ticks.color = textColor;
+                netWorthChart.options.scales.y.ticks.color = textColor;
+                netWorthChart.options.scales.x.grid.color = gridColor;
+                netWorthChart.options.scales.y.grid.color = function(context) {
+                    return context.tick.value === 0 ? (isDark ? '#6b7280' : '#374151') : gridColor;
+                };
+                netWorthChart.options.plugins.legend.labels.color = textColor;
+                netWorthChart.update('none');
+            }
+            
+            if (deltaChart) {
+                deltaChart.options.scales.x.ticks.color = textColor;
+                deltaChart.options.scales.y.ticks.color = textColor;
+                deltaChart.options.scales.x.grid.color = gridColor;
+                deltaChart.options.scales.y.grid.color = function(context) {
+                    return context.tick.value === 0 ? (isDark ? '#6b7280' : '#374151') : gridColor;
+                };
+                deltaChart.options.plugins.legend.labels.color = textColor;
+                deltaChart.update('none');
+            }
+        }
 
         // Animation helper functions
         function animateNumber(element, targetValue, duration = 300) {
@@ -620,10 +756,11 @@
             setTimeout(() => {
                 yearlyDataTableBody.innerHTML = '';
                 data.forEach(item => {
+                    const isDark = document.documentElement.classList.contains('dark');
+                    const advantageClass = item.advantage >= 0 ? (isDark ? 'text-blue-400' : 'text-blue-600') : (isDark ? 'text-green-400' : 'text-green-600');
                     const row = document.createElement('tr');
-                    const advantageClass = item.advantage >= 0 ? 'text-blue-600' : 'text-green-600';
-                    row.className = 'bg-white border-b hover:bg-gray-50 text-right';
-                    row.innerHTML = `<td class="py-2 px-4 font-medium text-gray-900 text-center">${item.year}</td><td class="py-2 px-3 border-l border-gray-300">${formatCurrency(item.house_rent_pm)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_rent)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_invested)}</td><td class="py-2 px-3">${formatCurrency(item.investment_growth)}</td><td class="py-2 px-3 font-semibold">${formatCurrency(item.renter_net_worth)}</td><td class="py-2 px-3 border-l border-gray-300">${formatCurrency(item.house_value)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_costs_p_i)}</td><td class="py-2 px-3">${formatCurrency(item.yearly_interest)}</td><td class="py-2 px-3 text-green-600">${formatCurrency(item.tax_deduction)}</td><td class="py-2 px-3">${formatCurrency(item.net_interest_cost)}</td><td class="py-2 px-3">${formatCurrency(item.property_tax)}</td><td class="py-2 px-3">${formatCurrency(item.maintenance)}</td><td class="py-2 px-3">${formatCurrency(item.vve)}</td><td class="py-2 px-3 font-semibold">${formatCurrency(item.buyer_net_worth)}</td><td class="py-2 px-4 font-semibold border-l border-gray-300 ${advantageClass}">${formatCurrency(item.advantage)}</td>`;
+                    row.className = `bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-right`;
+                    row.innerHTML = `<td class="py-2 px-4 font-medium text-gray-900 dark:text-gray-100 text-center">${item.year}</td><td class="py-2 px-3 border-l border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-200">${formatCurrency(item.house_rent_pm)}</td><td class="py-2 px-3 text-gray-900 dark:text-gray-200">${formatCurrency(item.yearly_rent)}</td><td class="py-2 px-3 text-gray-900 dark:text-gray-200">${formatCurrency(item.yearly_invested)}</td><td class="py-2 px-3 text-gray-900 dark:text-gray-200">${formatCurrency(item.investment_growth)}</td><td class="py-2 px-3 font-semibold text-gray-900 dark:text-gray-100">${formatCurrency(item.renter_net_worth)}</td><td class="py-2 px-3 border-l border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-200">${formatCurrency(item.house_value)}</td><td class="py-2 px-3 text-gray-900 dark:text-gray-200">${formatCurrency(item.yearly_costs_p_i)}</td><td class="py-2 px-3 text-gray-900 dark:text-gray-200">${formatCurrency(item.yearly_interest)}</td><td class="py-2 px-3 text-green-600 dark:text-green-400">${formatCurrency(item.tax_deduction)}</td><td class="py-2 px-3 text-gray-900 dark:text-gray-200">${formatCurrency(item.net_interest_cost)}</td><td class="py-2 px-3 text-gray-900 dark:text-gray-200">${formatCurrency(item.property_tax)}</td><td class="py-2 px-3 text-gray-900 dark:text-gray-200">${formatCurrency(item.maintenance)}</td><td class="py-2 px-3 text-gray-900 dark:text-gray-200">${formatCurrency(item.vve)}</td><td class="py-2 px-3 font-semibold text-gray-900 dark:text-gray-100">${formatCurrency(item.buyer_net_worth)}</td><td class="py-2 px-4 font-semibold border-l border-gray-300 dark:border-gray-600 ${advantageClass}">${formatCurrency(item.advantage)}</td>`;
                     yearlyDataTableBody.appendChild(row);
                 });
                 
@@ -634,6 +771,10 @@
         
         function updateChart(labels, buyData, rentData) {
             const ctx = document.getElementById('netWorthChart').getContext('2d');
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#e5e7eb' : '#374151';
+            const gridColor = isDark ? '#374151' : '#e5e7eb';
+            
             if (netWorthChart) {
                 // Update existing chart data with animation
                 netWorthChart.data.labels = labels;
@@ -659,19 +800,27 @@
                             easing: 'easeInOutQuad'
                         },
                         scales: { 
+                            x: {
+                                ticks: { color: textColor },
+                                grid: { color: gridColor }
+                            },
                             y: { 
                                 ticks: { 
+                                    color: textColor,
                                     callback: (value) => formatCurrency(value) 
-                                }
+                                },
+                                grid: { color: gridColor }
                             }
                         }, 
                         plugins: { 
                             legend: { 
-                                position: 'top', 
+                                position: 'top',
+                                labels: { color: textColor }
                             }, 
                             title: { 
                                 display: true, 
-                                text: 'Projected Net Worth Over Time'
+                                text: 'Projected Net Worth Over Time',
+                                color: textColor
                             }, 
                             tooltip: { 
                                 mode: 'index',
@@ -698,6 +847,10 @@
         
         function updateDeltaChart(labels, deltaData) {
             const ctx = document.getElementById('deltaChart').getContext('2d');
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#e5e7eb' : '#374151';
+            const gridColor = isDark ? '#374151' : '#e5e7eb';
+            
             if (deltaChart) {
                 // Update existing chart data with animation
                 deltaChart.data.labels = labels;
@@ -733,7 +886,8 @@
                             }, 
                             title: { 
                                 display: true, 
-                                text: 'Net Worth Advantage (Positive = Renting is Better)' 
+                                text: 'Net Worth Advantage (Positive = Renting is Better)',
+                                color: textColor
                             }, 
                             tooltip: { 
                                 callbacks: { 
@@ -747,12 +901,17 @@
                             } 
                         }, 
                         scales: { 
+                            x: {
+                                ticks: { color: textColor },
+                                grid: { color: gridColor }
+                            },
                             y: { 
                                 ticks: { 
+                                    color: textColor,
                                     callback: (value) => formatCurrency(value) 
                                 }, 
                                 grid: { 
-                                    color: (c) => c.tick.value === 0 ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.1)', 
+                                    color: (c) => c.tick.value === 0 ? (isDark ? '#6b7280' : '#374151') : gridColor, 
                                     lineWidth: (c) => c.tick.value === 0 ? 1.5 : 1, 
                                 } 
                             } 
@@ -793,8 +952,14 @@
         toggleYearlyDataButton.addEventListener('click', () => { const isHidden = yearlyDataSection.classList.toggle('hidden'); yearlyDataArrow.textContent = isHidden ? '▼' : '▲'; });
         exportCsvButton.addEventListener('click', exportToCsv);
         resetButton.addEventListener('click', resetToDefaults);
+        
+        // Theme toggle event listener
+        document.getElementById('themeToggle').addEventListener('change', toggleTheme);
 
         window.onload = () => {
+            // Initialize theme before anything else
+            initializeTheme();
+            
             Object.keys(inputsConfig).forEach(id => createSliderInput(id, inputsConfig[id]));
             setupInputListeners();
             
