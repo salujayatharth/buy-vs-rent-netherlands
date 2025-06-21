@@ -71,8 +71,20 @@
             <main class="lg:w-3/4 w-full">
                 <!-- Results Summary -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div class="bg-blue-50 p-6 rounded-lg shadow"><h3 class="text-xl font-semibold text-blue-700 mb-2">Renting Scenario</h3><p class="text-3xl font-bold text-blue-600 animate-value" id="rentFinalNW">€0</p><p class="text-sm text-gray-500">Projected Net Worth</p></div>
-                    <div class="bg-green-50 p-6 rounded-lg shadow"><h3 class="text-xl font-semibold text-green-700 mb-2">Buying Scenario</h3><p class="text-3xl font-bold text-green-600 animate-value" id="buyFinalNW">€0</p><p class="text-sm text-gray-500">Projected Net Worth (Equity)</p></div>
+                    <div class="bg-blue-50 p-6 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-blue-700 mb-2">Renting Scenario</h3>
+                        <p class="text-2xl font-bold text-blue-800 animate-value" id="rentMonthlyPayment">€0</p>
+                        <p class="text-xs text-gray-600 mb-3">Monthly Payment (Year 1)</p>
+                        <p class="text-3xl font-bold text-blue-600 animate-value" id="rentFinalNW">€0</p>
+                        <p class="text-sm text-gray-500">Projected Net Worth</p>
+                    </div>
+                    <div class="bg-green-50 p-6 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-green-700 mb-2">Buying Scenario</h3>
+                        <p class="text-2xl font-bold text-green-800 animate-value" id="buyMonthlyPayment">€0</p>
+                        <p class="text-xs text-gray-600 mb-3">Monthly Payment (Year 1)</p>
+                        <p class="text-3xl font-bold text-green-600 animate-value" id="buyFinalNW">€0</p>
+                        <p class="text-sm text-gray-500">Projected Net Worth (Equity)</p>
+                    </div>
                 </div>
                 <div class="text-center mb-6 p-4 bg-indigo-50 rounded-lg shadow">
                     <h3 class="text-xl font-semibold text-indigo-700">Advantage After Time Horizon</h3>
@@ -227,6 +239,7 @@
         // --- DOM Elements ---
         const el = (id) => document.getElementById(id);
         const rentFinalNWEl = el('rentFinalNW'), buyFinalNWEl = el('buyFinalNW');
+        const rentMonthlyPaymentEl = el('rentMonthlyPayment'), buyMonthlyPaymentEl = el('buyMonthlyPayment');
         const rentingAdvantageValueEl = el('rentingAdvantageValue');
         const toggleDetailsButton = el('toggleDetailsButton'), detailsSection = el('detailsSection'), detailsArrow = el('detailsArrow');
         const toggleYearlyDataButton = el('toggleYearlyDataButton'), yearlyDataSection = el('yearlyDataSection'), yearlyDataArrow = el('yearlyDataArrow');
@@ -470,6 +483,35 @@
             buyerNetWorthTimeline[0] = currentHomeValue - currentLoanBalance;
             renterNetWorthTimeline[0] = renterInvestedAssets;
             
+            // Calculate first year monthly payments for display in headers
+            const firstYearRentMonthly = currentMonthlyRent;
+            
+            // Calculate first year buyer costs (similar to year 1 in the loop below)
+            let firstYearInterest = 0, firstYearPrincipal = 0;
+            let tempLoanBalance = loanAmount;
+            
+            if (tempLoanBalance > 0) {
+                for (let month = 1; month <= 12; month++) {
+                    if (tempLoanBalance <= 0) break;
+                    const monthlyInterest = tempLoanBalance * ((inputs.mortgageInterestRate / 100) / 12);
+                    let monthlyPrincipal = monthlyMortgagePayment - monthlyInterest;
+                    if (monthlyPrincipal > tempLoanBalance) { monthlyPrincipal = tempLoanBalance; }
+                    firstYearInterest += monthlyInterest;
+                    firstYearPrincipal += monthlyPrincipal;
+                    tempLoanBalance -= monthlyPrincipal;
+                }
+            }
+            
+            const firstYearHomeValue = purchasePrice * (1 + (inputs.propertyAppreciationRate / 100));
+            const firstYearRecurringCostBase = inputs.maintenanceBasis === 'current' ? firstYearHomeValue : purchasePrice;
+            const firstYearMaintenanceCost = firstYearRecurringCostBase * (inputs.maintenanceCosts / 100);
+            const firstYearVveCost = firstYearRecurringCostBase * (inputs.vveRate / 100);
+            const firstYearOzbCost = firstYearHomeValue * (inputs.propertyTaxRate / 100);
+            const firstYearDeductionBenefit = firstYearInterest * (inputs.effectiveMarginalTaxRate / 100);
+            const firstYearMortgagePayment = firstYearPrincipal + firstYearInterest;
+            const firstYearBuyerCashOutflow = firstYearMortgagePayment + firstYearOzbCost + firstYearMaintenanceCost + firstYearVveCost - firstYearDeductionBenefit;
+            const firstYearBuyMonthly = firstYearBuyerCashOutflow / 12;
+            
             for (let year = 1; year <= inputs.timeHorizon; year++) {
                 labels.push(`Year ${year}`);
                 let interestPaidThisYear = 0, principalPaidThisYear = 0;
@@ -533,6 +575,10 @@
             // Animate the main summary values with smooth transitions
             animateNumber(rentFinalNWEl, finalRentNW);
             animateNumber(buyFinalNWEl, finalBuyNW);
+            
+            // Animate the monthly payment values
+            animateNumber(rentMonthlyPaymentEl, firstYearRentMonthly);
+            animateNumber(buyMonthlyPaymentEl, firstYearBuyMonthly);
             
             // Animate the advantage text and color change
             const advantageText = advantage >= 0 ? `Renting is better by ${formatCurrency(advantage)}` : `Buying is better by ${formatCurrency(Math.abs(advantage))}`;
